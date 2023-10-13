@@ -21,7 +21,7 @@ public class JwtHelper {
 
     /**
      * 传入payload信息获取token
-     * @param map payload
+     * @param userId:用户id
      * @return token
      */
     public static String createToken(Integer userId) {
