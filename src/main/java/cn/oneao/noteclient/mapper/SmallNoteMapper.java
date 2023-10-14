@@ -6,4 +6,5 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface SmallNoteMapper extends BaseMapper<SmallNote> {
+    void completeDeleteSmallNote(Integer smallNoteId);
 }

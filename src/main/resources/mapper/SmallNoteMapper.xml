@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--绑定接口-->
+<mapper namespace="cn.oneao.noteclient.mapper.SmallNoteMapper">
+    <delete id="completeDeleteSmallNote" parameterType="Integer">
+        delete from small_note where id = #{smallNoteId} and is_delete = 1
+    </delete>
+</mapper>

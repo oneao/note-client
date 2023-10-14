@@ -1,10 +1,16 @@
 package cn.oneao.noteclient.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @TableName("note_log")
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class NoteLog {
     @TableId(type = IdType.AUTO)
     private Integer id;
