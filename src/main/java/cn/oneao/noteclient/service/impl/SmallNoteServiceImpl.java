@@ -139,6 +139,7 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
         //添加日志
         this.addNoteActionLog(smallNoteDeleteDTO);
     }
+    //添加操作日志
     public void addNoteActionLog(SmallNoteDeleteDTO smallNoteDeleteDTO){
         NoteLog noteLog = new NoteLog();
         noteLog.setUserId(smallNoteDeleteDTO.getUserId());

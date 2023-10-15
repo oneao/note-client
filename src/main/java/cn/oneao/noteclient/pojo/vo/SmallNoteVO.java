@@ -10,9 +10,12 @@ import java.util.Date;
 @NoArgsConstructor
 public class SmallNoteVO {
     private Integer id; //id
-    private String title;   //标题
-    private String tags;    //标签
-    private Integer isTop;    //是否置顶(0:不置顶,1:置顶)
-    private Date createTime;//创建时间
-    private Integer isFinished;//是否完成(0:未完成,1:完成)
+    private Integer userId;//用户id
+    private String smallNoteTitle;//小记标题
+    private String smallNoteTags;//小记标签
+    private Integer isTop;//小记是否置顶
+    private Integer isFinished;//小记里面的标签是否全部完成(0:未完成，1:完成)
+    private Integer isPrompt;//是否开启小记到期提示(0:不开启,1:开启)
+    private Date beginTime;//到期提示的开始时间
+    private Date endTime;//到期提示的结束时间
 }
