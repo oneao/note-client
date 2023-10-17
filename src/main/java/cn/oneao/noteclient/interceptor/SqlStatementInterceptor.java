@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 })
 @Component
 public class SqlStatementInterceptor implements Interceptor {
-
     /**
      * 获取配置中需要拦截的表
      */
@@ -51,6 +50,9 @@ public class SqlStatementInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
+        GlobalObject object = (GlobalObject) GlobalObjectUtil.getInstance().getObject();
+        List<String> sqlStatements = object.getSqlStatements();
+        List<List<String>> sqlParams = object.getSqlParams();
         if (CollectionUtils.isEmpty(tableNames)) {
             //继续执行
             return invocation.proceed();
@@ -60,9 +62,15 @@ public class SqlStatementInterceptor implements Interceptor {
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
         BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
         String sql = boundSql.getSql().replaceAll("\\s+", " ").toLowerCase();
+        //log.info("sql:{}",sql);
+
         if (sql.toLowerCase().startsWith(IGNORE_SQL_PREFIX)) {
             //忽略自己 记录 sql 语句入库的sql
             return invocation.proceed();
+        }
+        //添加sql语句
+        if(!sqlStatements.contains(sql)){
+            sqlStatements.add(sql);
         }
 
         List<ParameterMapping> parameterMappings = new ArrayList<>(boundSql.getParameterMappings());
@@ -76,10 +84,10 @@ public class SqlStatementInterceptor implements Interceptor {
         TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
 
         try {
-            GlobalObject object = (GlobalObject) GlobalObjectUtil.getInstance().getObject();
-            List<String> sqlStatements = object.getSqlStatements();
+
             String parameter = "null";
             MetaObject newMetaObject = configuration.newMetaObject(parameterObject);
+            List<String> param = new ArrayList<>();
             for (ParameterMapping parameterMapping : parameterMappings) {
                 if (parameterMapping.getMode() == ParameterMode.OUT) {
                     continue;
@@ -93,11 +101,13 @@ public class SqlStatementInterceptor implements Interceptor {
                     parameter = getParameterValue(boundSql.getAdditionalParameter(propertyName));
                 }
                 // fixme 此处不严谨，若sql语句中有❓，则替换错位。?️
+                log.info("parameter:{}",parameter);
                 sql = sql.replaceFirst("\\?", parameter);
-                if(!sql.contains("?") && !sqlStatements.contains(sql)){
-                    sqlStatements.add(sql);
+                if (!param.contains(parameter)){
+                    param.add(parameter);
                 }
             }
+            sqlParams.add(param);
             // 将拦截到的sql语句插入日志表中
             //log.info("sql======================================:{}",sql);
         } catch (Exception e) {

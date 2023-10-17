@@ -15,4 +15,5 @@ public class GlobalObject {
     private Integer userId;
     private SqlActionLog sqlActionLog;
     private List<String> sqlStatements;
+    private List<List<String>> sqlParams;
 }

@@ -15,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Aspect
@@ -55,17 +57,58 @@ public class SqlExecutionTimeAspect {
         sqlActionLog.setUserId(userId);
         //获取当前线程的sql语句
         List<String> sqlStatements = globalObject.getSqlStatements();
-        for (String sqlStatement : sqlStatements) {
-            sqlActionLog.setSqlStatement(sqlStatement);
-            sqlActionLogMapper.insert(sqlActionLog);
+        //判空
+        if(ObjectUtils.isEmpty(sqlStatements)){
+            return proceed;
         }
+        //语句去重
+        //List<String> list = sqlStatements.stream().distinct().toList();
+        //String sqlStatement = removeSqlDuplicates(list);
+        String sqlStatement = changeSqlStatement(sqlStatements);
+        //获取sql语句中的参数
+        List<List<String>> sqlParams = globalObject.getSqlParams();
+        //对参数进行去重
+        String sqlParam = removeParmaDuplicates(sqlParams);
+        //赋值
+        sqlActionLog.setSqlParams(sqlParam);
+        sqlActionLog.setSqlStatements(sqlStatement);
+        //插入
+        sqlActionLogMapper.insert(sqlActionLog);
+        //移除
         GlobalObjectUtil.getInstance().removeObject();
         //移除后重新创建
         GlobalObject newGlobalObject = new GlobalObject();
         newGlobalObject.setUserId(userId);
         newGlobalObject.setSqlStatements(new ArrayList<>());
         newGlobalObject.setSqlActionLog(new SqlActionLog());
+        newGlobalObject.setSqlParams(new ArrayList<>());
         GlobalObjectUtil.getInstance().setObject(newGlobalObject);
         return proceed;
+    }
+    //数组去重
+    public String changeSqlStatement(List<String> nestedList){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < nestedList.size(); i++) {
+            if(i == 0){
+                stringBuilder.append("[").append(nestedList.get(i)).append("|||");
+            }else if(i == nestedList.size() - 1){
+                stringBuilder.append(nestedList.get(nestedList.size() - 1)).append("]");
+            }else {
+                stringBuilder.append(nestedList.get(i)).append("|||");
+            }
+        }
+        return stringBuilder.toString();
+    }
+    //参数去重
+    public String removeParmaDuplicates(List<List<String>> nestedList) {
+        List<List<String>> newList = new ArrayList<>();
+        int i = 1;
+        for (List<String> list : nestedList) {
+            if(i % 2 != 0){
+                newList.add(list);
+            }
+            i++;
+        }
+        return newList.toString();
     }
 }

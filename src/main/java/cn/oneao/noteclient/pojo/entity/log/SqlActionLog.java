@@ -23,7 +23,8 @@ public class SqlActionLog {
     private String requestMethod;//请求入口方法名
     private String requestParam;//请求入口参数
     private String sqlInterfaceName;//请求接口名
-    private String sqlStatement;//方法中执行的sql语句
+    private String sqlStatements;//方法中执行的sql语句
+    private String sqlParams;//sql中的参数
     private Long executionTime;//方法执行耗时
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;//存储的时间

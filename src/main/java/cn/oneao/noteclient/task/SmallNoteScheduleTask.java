@@ -49,6 +49,7 @@ public class SmallNoteScheduleTask {
             newGlobalObject.setUserId(0);//0代表系统信息
             newGlobalObject.setSqlStatements(new ArrayList<>());
             newGlobalObject.setSqlActionLog(new SqlActionLog());
+            newGlobalObject.setSqlParams(new ArrayList<>());
             GlobalObjectUtil.getInstance().setObject(newGlobalObject);
         }
         LambdaQueryWrapper<SmallNote> queryWrapper = new LambdaQueryWrapper<>();
