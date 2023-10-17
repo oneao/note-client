@@ -2,26 +2,22 @@ package cn.oneao.noteclient.service.impl;
 
 import cn.oneao.noteclient.enums.NoteActionEnums;
 import cn.oneao.noteclient.mapper.SmallNoteMapper;
+import cn.oneao.noteclient.pojo.dto.SmallNoteAddDTO;
 import cn.oneao.noteclient.pojo.dto.SmallNoteDeleteDTO;
 import cn.oneao.noteclient.pojo.dto.SmallNotePageDTO;
 import cn.oneao.noteclient.pojo.dto.SmallNoteTopStatusDTO;
-import cn.oneao.noteclient.pojo.entity.NoteLog;
+import cn.oneao.noteclient.pojo.entity.log.NoteLog;
 import cn.oneao.noteclient.pojo.entity.SmallNote;
 import cn.oneao.noteclient.pojo.vo.SmallNoteVO;
 import cn.oneao.noteclient.service.NoteLogService;
 import cn.oneao.noteclient.service.SmallNoteService;
 import cn.oneao.noteclient.utils.PageResult;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -55,7 +51,6 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
         Page<SmallNote> pageModal = new Page<>(page, pageSize);
         LambdaQueryWrapper<SmallNote> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SmallNote::getUserId, userId);
-        queryWrapper.eq(SmallNote::getIsDelete, 0);
         queryWrapper.orderByDesc(SmallNote::getIsTop);
         queryWrapper.orderByAsc(SmallNote::getIsFinished);
         queryWrapper.orderByDesc(SmallNote::getCreateTime);
@@ -154,5 +149,24 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
             noteLog.setActionDesc(NoteActionEnums.DELETE_SMALL_NOTE_COMPLETE.getActionDesc());
         }
         noteLogService.save(noteLog);
+    }
+
+    /**
+     * 新增小记对象
+     * @param smallNoteAddDTO 添加对象
+     */
+    @Transactional
+    @Override
+    public void addSmallNote(SmallNoteAddDTO smallNoteAddDTO) {
+        SmallNote smallNote = new SmallNote();
+        BeanUtils.copyProperties(smallNoteAddDTO,smallNote);
+        //添加小记操作日志
+        NoteLog noteLog = new NoteLog();
+        noteLog.setNoteId(smallNote.getId());
+        noteLog.setUserId(smallNote.getUserId());
+        noteLog.setAction(NoteActionEnums.USER_ADD_SMALL_NOTE.getActionName());
+        noteLog.setActionDesc(NoteActionEnums.USER_ADD_SMALL_NOTE.getActionDesc());
+        noteLogService.save(noteLog);
+        this.save(smallNote);
     }
 }

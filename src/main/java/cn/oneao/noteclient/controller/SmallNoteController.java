@@ -1,15 +1,19 @@
 package cn.oneao.noteclient.controller;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
+import cn.oneao.noteclient.pojo.dto.SmallNoteAddDTO;
 import cn.oneao.noteclient.pojo.dto.SmallNoteDeleteDTO;
 import cn.oneao.noteclient.pojo.dto.SmallNotePageDTO;
 import cn.oneao.noteclient.pojo.dto.SmallNoteTopStatusDTO;
+import cn.oneao.noteclient.pojo.entity.SmallNote;
 import cn.oneao.noteclient.pojo.vo.SmallNoteVO;
 import cn.oneao.noteclient.service.SmallNoteService;
 import cn.oneao.noteclient.utils.PageResult;
 import cn.oneao.noteclient.utils.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -42,9 +46,20 @@ public class SmallNoteController {
         return Result.success(ResponseEnums.SmallNote_UPDATE_STATUS_SUCCESS);
     }
 
+    /**
+     * 删除小记
+     * @param smallNoteDeleteDTO 前端传来的对象
+     * @return 返回删除成功的信息
+     */
     @DeleteMapping("/deleteSmallNote")
     public Result<Object> deleteSmallNote(@RequestBody SmallNoteDeleteDTO smallNoteDeleteDTO){
         smallNoteService.deleteSmallNote(smallNoteDeleteDTO);
         return Result.success(ResponseEnums.SmallNote_DELETE_LOGIC_SUCCESS);
+    }
+
+    @PostMapping("/addSmallNote")
+    public Result<Object> addSmallNote(@RequestBody SmallNoteAddDTO smallNoteAddDTO){
+        smallNoteService.addSmallNote(smallNoteAddDTO);
+        return Result.success(ResponseEnums.SmallNote_ADD_SUCCESS);
     }
 }

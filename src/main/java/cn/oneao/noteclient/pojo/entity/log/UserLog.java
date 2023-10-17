@@ -1,4 +1,4 @@
-package cn.oneao.noteclient.pojo.entity;
+package cn.oneao.noteclient.pojo.entity.log;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;

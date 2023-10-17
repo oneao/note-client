@@ -1,7 +1,10 @@
 package cn.oneao.noteclient.interceptor;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
-import cn.oneao.noteclient.pojo.entity.User;
+import cn.oneao.noteclient.pojo.entity.log.SqlActionLog;
+import cn.oneao.noteclient.service.UserService;
+import cn.oneao.noteclient.utils.GlobalThreadLocalUtils.GlobalObject;
+import cn.oneao.noteclient.utils.GlobalThreadLocalUtils.GlobalObjectUtil;
 import cn.oneao.noteclient.utils.JwtHelper;
 import cn.oneao.noteclient.utils.Result;
 import com.alibaba.fastjson.JSONObject;
@@ -9,10 +12,12 @@ import com.auth0.jwt.interfaces.Claim;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Map;
 @Slf4j
 public class LoginInterceptor implements HandlerInterceptor {
@@ -39,7 +44,11 @@ public class LoginInterceptor implements HandlerInterceptor {
                 if(userId.equals(String.valueOf(jwtUserId))){
                     //验证通过,放行
                     //TODO:ThreadLocal存储用户信息
-                    //ThreadLocal<User> threadLocal = new ThreadLocal<>();
+                    GlobalObject globalObject = new GlobalObject();
+                    globalObject.setUserId(Integer.parseInt(userId));
+                    globalObject.setSqlStatements(new ArrayList<>());
+                    globalObject.setSqlActionLog(new SqlActionLog());
+                    GlobalObjectUtil.getInstance().setObject(globalObject);
                     ////将当前用户信息放到线程中
                     //threadLocal.set(user);
                     flag = true;

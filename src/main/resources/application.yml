@@ -19,6 +19,7 @@ spring:
   mail:
     host: smtp.163.com   #邮箱服务器地址
     username: hi_itao@163.com   #邮箱账号
+    password: DUKLCSBQGPFITHQT  #邮箱授权码
     default-encoding: utf-8    #默认编码
   data:
     redis:

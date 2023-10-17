@@ -12,4 +12,5 @@ public class WebMvcFileConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/img/userAvatar/**")
                 .addResourceLocations(FileConstants.USER_AVATAR);
     }
+
 }

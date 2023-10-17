@@ -1,13 +1,19 @@
 package cn.oneao.noteclient.config;
 
 import cn.oneao.noteclient.interceptor.LoginInterceptor;
+import cn.oneao.noteclient.interceptor.RequestBodyInterceptor;
+import cn.oneao.noteclient.interceptor.SqlStatementInterceptor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -27,7 +33,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 //这里配置要拦截的路径
                 .addPathPatterns("/**")
                 //放行路径，其他都进行拦截
-                .excludePathPatterns(addPath);
+                .excludePathPatterns(addPath)
+                .order(1);
     }
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -45,5 +52,4 @@ public class WebMvcConfig implements WebMvcConfigurer {
         converter.setObjectMapper(objectMapper);
         converters.add(0, converter);
     }
-
 }

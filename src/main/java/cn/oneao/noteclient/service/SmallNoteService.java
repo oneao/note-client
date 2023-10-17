@@ -1,5 +1,6 @@
 package cn.oneao.noteclient.service;
 
+import cn.oneao.noteclient.pojo.dto.SmallNoteAddDTO;
 import cn.oneao.noteclient.pojo.dto.SmallNoteDeleteDTO;
 import cn.oneao.noteclient.pojo.dto.SmallNotePageDTO;
 import cn.oneao.noteclient.pojo.dto.SmallNoteTopStatusDTO;
@@ -16,4 +17,6 @@ public interface SmallNoteService extends IService<SmallNote> {
     void changeSmallNoteStatus(SmallNoteTopStatusDTO smallNoteTopStatusDTO);
 
     void deleteSmallNote(SmallNoteDeleteDTO smallNoteDeleteDTO);
+
+    void addSmallNote(SmallNoteAddDTO smallNoteAddDTO);
 }

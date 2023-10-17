@@ -1,21 +1,16 @@
 package cn.oneao.noteclient.controller;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
-import cn.oneao.noteclient.enums.UserActionEnums;
 import cn.oneao.noteclient.pojo.dto.UserLoginDTO;
 import cn.oneao.noteclient.pojo.dto.UserRegisterDTO;
 import cn.oneao.noteclient.pojo.entity.User;
-import cn.oneao.noteclient.pojo.entity.UserLog;
 import cn.oneao.noteclient.service.UserLogService;
 import cn.oneao.noteclient.service.UserService;
 import cn.oneao.noteclient.utils.Result;
-import cn.oneao.noteclient.utils.SendEmailUtil;
-import com.alibaba.druid.support.logging.Log;
+import cn.oneao.noteclient.utils.sendEmailUtils.SendRegisterEmailUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +26,7 @@ public class UserController {
     @Autowired
     private UserLogService userLogService;
     @Autowired
-    private SendEmailUtil sendEmailUtil;
+    private SendRegisterEmailUtil sendRegisterEmailUtil;
 
     /**
      * 登录
@@ -59,7 +54,7 @@ public class UserController {
         if (!ObjectUtils.isEmpty(oneUser)){
             return Result.error(ResponseEnums.USER_REGISTER_EMAIL_EXIST);
         }
-        boolean flag = sendEmailUtil.sendEmailVerificationCode(email);
+        boolean flag = sendRegisterEmailUtil.sendEmailVerificationCode(email);
         if(flag){
             return Result.success(ResponseEnums.USER_REGISTER_GET_CAPTCHA_SUCCESS);
         }

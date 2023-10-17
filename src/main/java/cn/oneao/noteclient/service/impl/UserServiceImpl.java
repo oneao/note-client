@@ -5,7 +5,7 @@ import cn.oneao.noteclient.enums.UserActionEnums;
 import cn.oneao.noteclient.mapper.UserMapper;
 import cn.oneao.noteclient.pojo.dto.UserRegisterDTO;
 import cn.oneao.noteclient.pojo.entity.User;
-import cn.oneao.noteclient.pojo.entity.UserLog;
+import cn.oneao.noteclient.pojo.entity.log.UserLog;
 import cn.oneao.noteclient.pojo.vo.UserLoginVO;
 import cn.oneao.noteclient.service.UserLogService;
 import cn.oneao.noteclient.service.UserService;

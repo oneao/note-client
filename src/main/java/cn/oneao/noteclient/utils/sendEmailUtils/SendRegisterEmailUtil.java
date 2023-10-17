@@ -1,4 +1,4 @@
-package cn.oneao.noteclient.utils;
+package cn.oneao.noteclient.utils.sendEmailUtils;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -16,7 +16,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class SendEmailUtil {
+public class SendRegisterEmailUtil {
     @Value("${mail.fromMail.fromAddress}")
     private String fromEmail;
     @Autowired

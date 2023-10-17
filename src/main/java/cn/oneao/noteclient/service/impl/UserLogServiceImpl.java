@@ -2,7 +2,7 @@ package cn.oneao.noteclient.service.impl;
 
 import cn.oneao.noteclient.enums.UserActionEnums;
 import cn.oneao.noteclient.mapper.UserLogMapper;
-import cn.oneao.noteclient.pojo.entity.UserLog;
+import cn.oneao.noteclient.pojo.entity.log.UserLog;
 import cn.oneao.noteclient.service.UserLogService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
