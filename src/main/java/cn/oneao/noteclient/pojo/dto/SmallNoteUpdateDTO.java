@@ -1,26 +1,16 @@
-package cn.oneao.noteclient.pojo.entity;
+package cn.oneao.noteclient.pojo.dto;
 
-import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
-
-/**
- * 小记实体类
- */
-@TableName("small_note")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class SmallNote {
-    @TableId(type = IdType.AUTO)
-    private Integer id; //id
+public class SmallNoteUpdateDTO {
     private Integer userId;//用户id
+    private Integer smallNoteId;//小记id
     private String smallNoteTitle;//小记标题
     private String smallNoteTags;//小记标签
     private String smallNoteEvents;//小记事件
@@ -30,10 +20,4 @@ public class SmallNote {
     private Integer isPrompt;//是否开启小记到期提示(0:不开启,1:开启)
     private Date beginTime;//到期提示的开始时间
     private Date endTime;//到期提示的结束时间
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;//小记创建时间
-    @TableField(fill = FieldFill.UPDATE)
-    private Date updateTime;//小记更新时间
-    @TableField(fill = FieldFill.INSERT)
-    private Integer isDelete;//是否删除(0：正常，1：删除，2：彻底删除)
 }

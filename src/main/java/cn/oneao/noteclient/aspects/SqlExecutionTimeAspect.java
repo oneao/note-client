@@ -61,9 +61,7 @@ public class SqlExecutionTimeAspect {
         if(ObjectUtils.isEmpty(sqlStatements)){
             return proceed;
         }
-        //语句去重
-        //List<String> list = sqlStatements.stream().distinct().toList();
-        //String sqlStatement = removeSqlDuplicates(list);
+        //修改sql语句格式
         String sqlStatement = changeSqlStatement(sqlStatements);
         //获取sql语句中的参数
         List<List<String>> sqlParams = globalObject.getSqlParams();
@@ -87,6 +85,9 @@ public class SqlExecutionTimeAspect {
     }
     //数组去重
     public String changeSqlStatement(List<String> nestedList){
+        if (nestedList.size() == 1){
+            return nestedList.toString();
+        }
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < nestedList.size(); i++) {
             if(i == 0){

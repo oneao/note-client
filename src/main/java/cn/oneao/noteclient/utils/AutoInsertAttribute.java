@@ -20,7 +20,6 @@ public class AutoInsertAttribute implements MetaObjectHandler {
         //SmallNote实体类
         this.setFieldValByName("isDelete",0,metaObject);
         this.setFieldValByName("type",0,metaObject);
-        this.setFieldValByName("isFinished",0,metaObject);
     }
 
     @Override

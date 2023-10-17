@@ -1,11 +1,9 @@
 package cn.oneao.noteclient.controller;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
-import cn.oneao.noteclient.pojo.dto.SmallNoteAddDTO;
-import cn.oneao.noteclient.pojo.dto.SmallNoteDeleteDTO;
-import cn.oneao.noteclient.pojo.dto.SmallNotePageDTO;
-import cn.oneao.noteclient.pojo.dto.SmallNoteTopStatusDTO;
+import cn.oneao.noteclient.pojo.dto.*;
 import cn.oneao.noteclient.pojo.entity.SmallNote;
+import cn.oneao.noteclient.pojo.vo.SmallNoteOneVO;
 import cn.oneao.noteclient.pojo.vo.SmallNoteVO;
 import cn.oneao.noteclient.service.SmallNoteService;
 import cn.oneao.noteclient.utils.PageResult;
@@ -57,9 +55,36 @@ public class SmallNoteController {
         return Result.success(ResponseEnums.SmallNote_DELETE_LOGIC_SUCCESS);
     }
 
+    /**
+     * 新增小记
+     * @param smallNoteAddDTO 新增小记对象
+     * @return 返回成功信息
+     */
     @PostMapping("/addSmallNote")
     public Result<Object> addSmallNote(@RequestBody SmallNoteAddDTO smallNoteAddDTO){
         smallNoteService.addSmallNote(smallNoteAddDTO);
         return Result.success(ResponseEnums.SmallNote_ADD_SUCCESS);
+    }
+
+    /**
+     * 获取单个小记
+     * @param smallNoteId 小记id
+     * @return 返回该小记的信息
+     */
+    @GetMapping("/getOneSmallNote")
+    public Result<Object> getOneSmallNote(@RequestParam("id")Integer smallNoteId){
+        SmallNoteOneVO oneSmallNote = smallNoteService.getOneSmallNote(smallNoteId);
+        return Result.success(oneSmallNote);
+    }
+
+    /**
+     * 更新小记
+     * @param smallNoteUpdateDTO 前端填的信息
+     * @return 返回成功的信息
+     */
+    @PostMapping("/updateSmallNote")
+    public Result<Object> updateSmallNote(@RequestBody SmallNoteUpdateDTO smallNoteUpdateDTO){
+        smallNoteService.updateSmallNote(smallNoteUpdateDTO);
+        return Result.success(ResponseEnums.SmallNote_UPDATE_STATUS_SUCCESS);
     }
 }

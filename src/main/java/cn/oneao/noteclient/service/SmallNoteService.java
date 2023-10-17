@@ -1,10 +1,8 @@
 package cn.oneao.noteclient.service;
 
-import cn.oneao.noteclient.pojo.dto.SmallNoteAddDTO;
-import cn.oneao.noteclient.pojo.dto.SmallNoteDeleteDTO;
-import cn.oneao.noteclient.pojo.dto.SmallNotePageDTO;
-import cn.oneao.noteclient.pojo.dto.SmallNoteTopStatusDTO;
+import cn.oneao.noteclient.pojo.dto.*;
 import cn.oneao.noteclient.pojo.entity.SmallNote;
+import cn.oneao.noteclient.pojo.vo.SmallNoteOneVO;
 import cn.oneao.noteclient.pojo.vo.SmallNoteVO;
 import cn.oneao.noteclient.utils.PageResult;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -19,4 +17,8 @@ public interface SmallNoteService extends IService<SmallNote> {
     void deleteSmallNote(SmallNoteDeleteDTO smallNoteDeleteDTO);
 
     void addSmallNote(SmallNoteAddDTO smallNoteAddDTO);
+
+    SmallNoteOneVO getOneSmallNote(Integer smallNoteId);
+
+    void updateSmallNote(SmallNoteUpdateDTO smallNoteUpdateDTO);
 }

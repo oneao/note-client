@@ -21,7 +21,8 @@ public enum ResponseEnums {
     //小记操作
     SmallNote_UPDATE_STATUS_SUCCESS(60004,"更新成功"),
     SmallNote_DELETE_LOGIC_SUCCESS(60005,"删除成功,可在回收站内恢复"),
-    SmallNote_ADD_SUCCESS(60006,"新增小记成功");
+    SmallNote_ADD_SUCCESS(60006,"新增小记成功"),
+    SmallNote_UPDATE_SUCCESS(60007,"更新小记成功");
     private final Integer code;   //响应码
     private final String msg; //相应信息
 }

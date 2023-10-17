@@ -2,12 +2,10 @@ package cn.oneao.noteclient.service.impl;
 
 import cn.oneao.noteclient.enums.NoteActionEnums;
 import cn.oneao.noteclient.mapper.SmallNoteMapper;
-import cn.oneao.noteclient.pojo.dto.SmallNoteAddDTO;
-import cn.oneao.noteclient.pojo.dto.SmallNoteDeleteDTO;
-import cn.oneao.noteclient.pojo.dto.SmallNotePageDTO;
-import cn.oneao.noteclient.pojo.dto.SmallNoteTopStatusDTO;
+import cn.oneao.noteclient.pojo.dto.*;
 import cn.oneao.noteclient.pojo.entity.log.NoteLog;
 import cn.oneao.noteclient.pojo.entity.SmallNote;
+import cn.oneao.noteclient.pojo.vo.SmallNoteOneVO;
 import cn.oneao.noteclient.pojo.vo.SmallNoteVO;
 import cn.oneao.noteclient.service.NoteLogService;
 import cn.oneao.noteclient.service.SmallNoteService;
@@ -150,7 +148,6 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
         }
         noteLogService.save(noteLog);
     }
-
     /**
      * 新增小记对象
      * @param smallNoteAddDTO 添加对象
@@ -160,13 +157,62 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
     public void addSmallNote(SmallNoteAddDTO smallNoteAddDTO) {
         SmallNote smallNote = new SmallNote();
         BeanUtils.copyProperties(smallNoteAddDTO,smallNote);
+        this.save(smallNote);
         //添加小记操作日志
         NoteLog noteLog = new NoteLog();
-        noteLog.setNoteId(smallNote.getId());
+        noteLog.setSmallNoteId(smallNote.getId());
         noteLog.setUserId(smallNote.getUserId());
         noteLog.setAction(NoteActionEnums.USER_ADD_SMALL_NOTE.getActionName());
         noteLog.setActionDesc(NoteActionEnums.USER_ADD_SMALL_NOTE.getActionDesc());
         noteLogService.save(noteLog);
+    }
+    /**
+     * 获取一个smallNote对象
+     * @param smallNoteId 小记id
+     * @return 返回该小记的信息
+     */
+    @Override
+    public SmallNoteOneVO getOneSmallNote(Integer smallNoteId) {
+        if (ObjectUtils.isEmpty(smallNoteId)){
+            return null;
+        }
+        SmallNote smallNote = this.getById(smallNoteId);
+        SmallNoteOneVO smallNoteOneVO = new SmallNoteOneVO();
+        BeanUtils.copyProperties(smallNote,smallNoteOneVO);
+        return smallNoteOneVO;
+    }
+
+    /**
+     * 更新小记
+     * @param smallNoteUpdateDTO 更新小记对象
+     */
+    @Transactional
+    @Override
+    public void updateSmallNote(SmallNoteUpdateDTO smallNoteUpdateDTO) {
+        //先删除，后更新
+        Integer smallNoteId = smallNoteUpdateDTO.getSmallNoteId();
+        if(ObjectUtils.isEmpty(smallNoteId)){
+            return;
+        }
+        //删除，再添加
+        this.removeById(smallNoteId);
+        //删除日志
+        NoteLog delNoteLog = new NoteLog();
+        delNoteLog.setSmallNoteId(smallNoteId);
+        delNoteLog.setUserId(smallNoteUpdateDTO.getUserId());
+        delNoteLog.setAction(NoteActionEnums.SYSTEM_LOGIN_DELETE_SmallNote.getActionName());
+        delNoteLog.setActionDesc(NoteActionEnums.SYSTEM_LOGIN_DELETE_SmallNote.getActionDesc());
+        noteLogService.save(delNoteLog);
+        //创建SmallNote对象
+        SmallNote smallNote = new SmallNote();
+        BeanUtils.copyProperties(smallNoteUpdateDTO,smallNote);
         this.save(smallNote);
+        //添加日志
+        NoteLog noteLog = new NoteLog();
+        noteLog.setSmallNoteId(smallNote.getId());
+        noteLog.setUserId(smallNote.getUserId());
+        noteLog.setAction(NoteActionEnums.USER_UPDATE_SmallNote.getActionName());
+        noteLog.setActionDesc(NoteActionEnums.USER_UPDATE_SmallNote.getActionDesc());
+        noteLogService.save(noteLog);
     }
 }
