@@ -50,7 +50,7 @@ public class SqlStatementInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        GlobalObject object = (GlobalObject) GlobalObjectUtil.getInstance().getObject();
+        GlobalObject object =  GlobalObjectUtil.getInstance().getObject();
         List<String> sqlStatements = object.getSqlStatements();
         List<List<String>> sqlParams = object.getSqlParams();
         if (CollectionUtils.isEmpty(tableNames)) {

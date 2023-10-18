@@ -1,27 +1,37 @@
 package cn.oneao.noteclient.utils.GlobalThreadLocalUtils;
 
-public class GlobalObjectUtil<T> {
-    private static final GlobalObjectUtil<?> instance = new GlobalObjectUtil<>();
-    private T object;
+import cn.oneao.noteclient.pojo.entity.log.SqlActionLog;
+
+import java.util.ArrayList;
+
+public class GlobalObjectUtil {
+    private static final GlobalObjectUtil instance = new GlobalObjectUtil();
+    private GlobalObject object;
 
     private GlobalObjectUtil() {
+        object = new GlobalObject();
+        object.setSqlParams(new ArrayList<>());
+        object.setSqlStatements(new ArrayList<>());
+        object.setUserId(0);
+        object.setSqlActionLog(new SqlActionLog());
     }
 
-    public static <T> GlobalObjectUtil<T> getInstance() {
-        return (GlobalObjectUtil<T>) instance;
+    public static GlobalObjectUtil getInstance() {
+        return (GlobalObjectUtil) instance;
     }
 
-    public void setObject(T obj) {
-        this.object = obj;
+    public void setObject(GlobalObject obj) {
+        object = obj;
     }
 
-    public T getObject() {
+    public GlobalObject getObject() {
         return object;
     }
 
     public void removeObject() {
-        this.object = null;
+        object.setSqlParams(new ArrayList<>());
+        object.setSqlStatements(new ArrayList<>());
+        object.setUserId(0);
+        object.setSqlActionLog(new SqlActionLog());
     }
 }
-
-

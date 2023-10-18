@@ -25,7 +25,7 @@ public class RequestBodyInterceptor implements RequestBodyAdvice {
 
     @Override
     public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter parameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) throws IOException {
-        GlobalObject object = (GlobalObject) GlobalObjectUtil.getInstance().getObject();
+        GlobalObject object = GlobalObjectUtil.getInstance().getObject();
         SqlActionLog sqlActionLog = object.getSqlActionLog();
         //类名
         String className = parameter.getDeclaringClass().getName();
@@ -67,7 +67,7 @@ public class RequestBodyInterceptor implements RequestBodyAdvice {
 
     @Override
     public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        GlobalObject object = (GlobalObject) GlobalObjectUtil.getInstance().getObject();
+        GlobalObject object =GlobalObjectUtil.getInstance().getObject();
         SqlActionLog sqlActionLog = object.getSqlActionLog();
         String requestBody = body.toString();
         sqlActionLog.setRequestParam(requestBody);

@@ -52,6 +52,12 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
         queryWrapper.orderByDesc(SmallNote::getIsTop);
         queryWrapper.orderByAsc(SmallNote::getIsFinished);
         queryWrapper.orderByDesc(SmallNote::getCreateTime);
+        if (!ObjectUtils.isEmpty(smallNotePageDTO.getFilterValue())){
+            queryWrapper.eq(SmallNote::getIsFinished,smallNotePageDTO.getFilterValue());
+        }
+        if(!ObjectUtils.isEmpty(smallNotePageDTO.getSearchValue())){
+            queryWrapper.like(SmallNote::getSmallNoteTitle,smallNotePageDTO.getSearchValue());
+        }
         Page<SmallNote> smallNotePage = smallNoteMapper.selectPage(pageModal, queryWrapper);
 
         List<SmallNote> smallNotes = smallNotePage.getRecords();
@@ -90,16 +96,6 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
                 //更新
                 this.update(updateWrapper);
             } else if (smallNoteTopStatus == 0) {
-                //置顶
-                LambdaQueryWrapper<SmallNote> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.eq(SmallNote::getIsTop, 1);
-                SmallNote smallNote = smallNoteMapper.selectOne(queryWrapper);
-                //判断是否有已经置顶的小记
-                if (!ObjectUtils.isEmpty(smallNote)) {
-                    //如果有的话，则取消置顶
-                    smallNote.setIsTop(0);
-                    smallNoteMapper.updateById(smallNote);
-                }
                 //更新小记状态
                 LambdaUpdateWrapper<SmallNote> updateWrapper = new LambdaUpdateWrapper<>();
                 updateWrapper.eq(SmallNote::getUserId, userId);

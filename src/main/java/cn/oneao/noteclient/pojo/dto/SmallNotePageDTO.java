@@ -13,4 +13,6 @@ public class SmallNotePageDTO {
     private Integer userId;
     private Integer page;
     private Integer pageSize;
+    private Integer filterValue;
+    private String searchValue;
 }

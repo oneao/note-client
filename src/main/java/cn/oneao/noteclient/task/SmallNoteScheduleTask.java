@@ -41,17 +41,8 @@ public class SmallNoteScheduleTask {
     @LogSqlExecution
     public void configureTasks() {
         //移除后重新创建
-        GlobalObject globalObject = (GlobalObject) GlobalObjectUtil.getInstance().getObject();
-        if(!ObjectUtils.isEmpty(globalObject)){
-            globalObject.setUserId(0);
-        }else{
-            GlobalObject newGlobalObject = new GlobalObject();
-            newGlobalObject.setUserId(0);//0代表系统信息
-            newGlobalObject.setSqlStatements(new ArrayList<>());
-            newGlobalObject.setSqlActionLog(new SqlActionLog());
-            newGlobalObject.setSqlParams(new ArrayList<>());
-            GlobalObjectUtil.getInstance().setObject(newGlobalObject);
-        }
+        GlobalObject globalObject = GlobalObjectUtil.getInstance().getObject();
+        globalObject.setUserId(0);
         LambdaQueryWrapper<SmallNote> queryWrapper = new LambdaQueryWrapper<>();
         //开启消息通知
         queryWrapper.eq(SmallNote::getIsPrompt, 1);

@@ -43,12 +43,8 @@ public class LoginInterceptor implements HandlerInterceptor {
                 Integer jwtUserId = claim.asInt();
                 if(userId.equals(String.valueOf(jwtUserId))){
                     //验证通过,放行
-                    GlobalObject globalObject = new GlobalObject();
-                    globalObject.setUserId(Integer.parseInt(userId));
-                    globalObject.setSqlStatements(new ArrayList<>());
-                    globalObject.setSqlActionLog(new SqlActionLog());
-                    globalObject.setSqlParams(new ArrayList<>());
-                    GlobalObjectUtil.getInstance().setObject(globalObject);
+                    GlobalObject object = GlobalObjectUtil.getInstance().getObject();
+                    object.setUserId(Integer.parseInt(userId));
                     ////将当前用户信息放到线程中
                     //threadLocal.set(user);
                     flag = true;
