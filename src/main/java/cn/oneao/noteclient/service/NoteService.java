@@ -20,5 +20,5 @@ public interface NoteService extends IService<Note> {
     //删除笔记状态
     Result<Object> deleteNote(NoteDeleteDTO noteDeleteDTO);
     //新增笔记
-    Result<Object> addNote();
+    Result<Integer> addNote();
 }

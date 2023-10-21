@@ -13,7 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.DigestUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -30,17 +32,5 @@ import java.util.regex.Pattern;
 class NoteClientApplicationTests {
     @Test
     void contextLoads() {
-        List<List<String>> list = new ArrayList<>();
-        List<String> list1 = new ArrayList<>();
-        List<String> list2 = new ArrayList<>();
-        list1.add("a");
-        list1.add("b");
-        list1.add("c");
-        list2.add("a");
-        list2.add("b");
-        list.add(list1);
-        list.add(list2);
-        String string = list.toString();
-        System.out.println(string);
     }
 }

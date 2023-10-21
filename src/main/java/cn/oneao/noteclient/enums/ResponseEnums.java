@@ -26,7 +26,7 @@ public enum ResponseEnums {
     SmallNote_ADD_SUCCESS(60006,"新增小记成功"),
     SmallNote_UPDATE_SUCCESS(60007,"更新小记成功"),
     //笔记操作
-    NOTE_VERIFY_LOCK_SUCCESS(60008,"验证笔记密码正确"),
+    NOTE_VERIFY_LOCK_SUCCESS(60008,"笔记密码正确"),
     NOTE_VERIFY_LOCK_ERROR(60009,"笔记密码错误"),
     NOTE_TOP_UPDATE_SUCCESS(60010,"笔记置顶状态修改成功"),
     Note_DELETE_LOGIC_SUCCESS(60011,"删除成功,可在回收站内恢复"),

@@ -16,16 +16,23 @@ import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.sun.mail.smtp.DigestMD5;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.logging.Log;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
+@Slf4j
 public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements NoteService {
     @Autowired
     private NoteMapper noteMapper;
@@ -124,7 +131,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
     //新增笔记
     @Override
     @Transactional
-    public Result<Object> addNote() {
+    public Result<Integer> addNote() {
         //新增笔记
         Note note = new Note();
         note.setIsLock(0);
@@ -138,6 +145,6 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         noteLog.setAction(NoteActionEnums.USER_ADD_NOTE.getActionName());
         noteLog.setActionDesc(NoteActionEnums.USER_ADD_NOTE.getActionDesc());
         noteLogService.save(noteLog);
-        return Result.success(ResponseEnums.Note_ADD_SUCCESS);
+        return Result.success(note.getId(),ResponseEnums.Note_ADD_SUCCESS);
     }
 }

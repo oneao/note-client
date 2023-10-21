@@ -30,12 +30,11 @@ public class NoteController {
         List<NoteVO> noteInfo = noteService.getNoteInfo();
         return Result.success(noteInfo);
     }
-    /**
-     * TODO:验证笔记密码是否正确
+    /** 验证笔记是否正确
      * @param noteVerifyLockPassWordDTO 验证密码对象
      * @return 返回验证成功或失败。
      */
-    @GetMapping("/verifyNoteLockPassword")
+    @PostMapping("/verifyNoteLockPassword")
     public Result<Object> verifyNoteLockPassword(@RequestBody NoteVerifyLockPassWordDTO noteVerifyLockPassWordDTO) {
         Boolean flag = noteService.verifyNoteLockPassword(noteVerifyLockPassWordDTO);
         if (flag) {
@@ -70,7 +69,8 @@ public class NoteController {
      * @return 返回添加成功
      */
     @GetMapping("/addNote")
-    public Result<Object> addNote(){
+    public Result<Integer> addNote(){
         return noteService.addNote();
     }
+
 }

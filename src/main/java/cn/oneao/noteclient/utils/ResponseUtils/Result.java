@@ -22,12 +22,6 @@ public class Result<T> {
         return result;
     }
 
-    public static <T> Result<T> success(Integer code,T object) {
-        Result<T> result = new Result<T>();
-        result.data = object;
-        result.code = code;
-        return result;
-    }
     public static <T> Result<T> success(T obj,ResponseEnums responseEnums) {
         Result<T> result = new Result<T>();
         result.code = responseEnums.getCode();
