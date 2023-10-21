@@ -1,5 +1,6 @@
-package cn.oneao.noteclient.utils.sendEmailUtils;
+package cn.oneao.noteclient.utils.SendEmailUtils;
 
+import cn.oneao.noteclient.utils.RedisCache;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,7 @@ public class SendRegisterEmailUtil {
     @Autowired
     private TemplateEngine templateEngine;
     @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
-
+    private RedisCache redisCache;
     public boolean sendEmailVerificationCode(String toEmail) {
         //1.生成随机验证码
         String code = getCode();
@@ -45,7 +45,7 @@ public class SendRegisterEmailUtil {
             helper.setText(emailContent, true);
             mailSender.send(message);
             //设置过期时间为3分钟
-            redisTemplate.opsForValue().set(toEmail,code,3, TimeUnit.MINUTES);
+            redisCache.setCacheObject(toEmail,code,3,TimeUnit.MINUTES);
             return true;
         } catch (MessagingException e) {
             throw new RuntimeException(e);

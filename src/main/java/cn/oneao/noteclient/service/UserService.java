@@ -2,7 +2,7 @@ package cn.oneao.noteclient.service;
 
 import cn.oneao.noteclient.pojo.dto.UserRegisterDTO;
 import cn.oneao.noteclient.pojo.entity.User;
-import cn.oneao.noteclient.utils.Result;
+import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;

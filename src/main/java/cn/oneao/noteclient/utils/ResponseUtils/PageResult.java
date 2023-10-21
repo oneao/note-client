@@ -1,4 +1,4 @@
-package cn.oneao.noteclient.utils;
+package cn.oneao.noteclient.utils.ResponseUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

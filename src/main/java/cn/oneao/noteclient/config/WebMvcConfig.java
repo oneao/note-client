@@ -33,8 +33,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 //这里配置要拦截的路径
                 .addPathPatterns("/**")
                 //放行路径，其他都进行拦截
-                .excludePathPatterns(addPath)
-                .order(1);
+                .excludePathPatterns(addPath);
     }
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {

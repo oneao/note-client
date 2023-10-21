@@ -1,10 +1,8 @@
 package cn.oneao.noteclient.interceptor;
 
-import cn.oneao.noteclient.pojo.entity.log.SqlActionLog;
-import cn.oneao.noteclient.utils.GlobalThreadLocalUtils.GlobalObject;
-import cn.oneao.noteclient.utils.GlobalThreadLocalUtils.GlobalObjectUtil;
+import cn.oneao.noteclient.utils.GlobalObjectUtils.GlobalObject;
+import cn.oneao.noteclient.utils.GlobalObjectUtils.GlobalObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Component;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -37,7 +34,7 @@ public class SqlStatementInterceptor implements Interceptor {
      * 获取配置中需要拦截的表
      */
     //@Value("#{'${tmall.sync.tables:}'.split(',')}")
-    private List<String> tableNames = Arrays.asList("small_note","user");
+    private List<String> tableNames = Arrays.asList("small_note","user","note");
 
 /*    @Lazy
     @Autowired

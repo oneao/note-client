@@ -23,7 +23,7 @@ public class User {
     private Integer level;
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
-    @TableField(fill = FieldFill.UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
     @TableField(fill = FieldFill.INSERT)
     private Integer status;

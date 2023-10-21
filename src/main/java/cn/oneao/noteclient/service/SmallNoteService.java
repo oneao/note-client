@@ -4,10 +4,8 @@ import cn.oneao.noteclient.pojo.dto.*;
 import cn.oneao.noteclient.pojo.entity.SmallNote;
 import cn.oneao.noteclient.pojo.vo.SmallNoteOneVO;
 import cn.oneao.noteclient.pojo.vo.SmallNoteVO;
-import cn.oneao.noteclient.utils.PageResult;
+import cn.oneao.noteclient.utils.ResponseUtils.PageResult;
 import com.baomidou.mybatisplus.extension.service.IService;
-
-import java.util.List;
 
 public interface SmallNoteService extends IService<SmallNote> {
     PageResult<SmallNoteVO> getSmallNoteInfo(SmallNotePageDTO smallNotePageDTO);

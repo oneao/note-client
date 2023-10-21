@@ -32,7 +32,7 @@ public class SmallNote {
     private Date endTime;//到期提示的结束时间
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;//小记创建时间
-    @TableField(fill = FieldFill.UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;//小记更新时间
     @TableField(fill = FieldFill.INSERT)
     private Integer isDelete;//是否删除(0：正常，1：删除，2：彻底删除)

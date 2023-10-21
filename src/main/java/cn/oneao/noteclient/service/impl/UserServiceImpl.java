@@ -9,12 +9,15 @@ import cn.oneao.noteclient.pojo.entity.log.UserLog;
 import cn.oneao.noteclient.pojo.vo.UserLoginVO;
 import cn.oneao.noteclient.service.UserLogService;
 import cn.oneao.noteclient.service.UserService;
+import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
 import cn.oneao.noteclient.utils.JwtHelper;
-import cn.oneao.noteclient.utils.Result;
+import cn.oneao.noteclient.utils.RedisCache;
+import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,18 +35,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private UserLogService userLogService;
     @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
+    private RedisCache redisCache;
+    @Value("${md5encrypt.addSalt.value}")
+    private String md5encryptAddSaltValue;
     @Override
     public Map<String, Object> userLogin(String email, String password) {
         Map<String, Object> map = new HashMap<>();
 
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getEmail,email);
-        queryWrapper.eq(User::getPassword,DigestUtils.md5DigestAsHex(password.getBytes(StandardCharsets.UTF_8)));
+        String userPassword = DigestUtils.md5DigestAsHex((md5encryptAddSaltValue+password).getBytes(StandardCharsets.UTF_8));
+        queryWrapper.eq(User::getPassword,userPassword);
         queryWrapper.eq(User::getIsDelete,0);
         User user = userMapper.selectOne(queryWrapper);
 
         if(!ObjectUtils.isEmpty(user)){
+            UserContext.setUserId(user.getId());
             UserLog userLog = new UserLog();
             userLog.setUserId(user.getId());
             userLog.setAction(UserActionEnums.USER_LOGIN.getActionName());
@@ -61,11 +68,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public Result<Object> userRegister(UserRegisterDTO userRegisterDTO) {
         String email = userRegisterDTO.getEmail();
         //验证码不存在，或者已经过期。
-        Boolean flag = redisTemplate.hasKey(email);
+        boolean flag = redisCache.hasKey(email);
+        //Boolean flag = redisTemplate.hasKey(email);
         if(Boolean.FALSE.equals(flag)){
             return Result.error(ResponseEnums.USER_REGISTER_CAPTCHA_OVERDUE);
         }
-        String code = (String) redisTemplate.opsForValue().get(email);
+        //String code = (String) redisTemplate.opsForValue().get(email);
+        String code = (String) redisCache.getCacheObject(email);
         if(!ObjectUtils.isEmpty(code) && !code.equals(userRegisterDTO.getCode())){
             return Result.error(ResponseEnums.USER_REGISTER_CAPTCHA_ERR);
         }
@@ -74,7 +83,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setNickName(email);
         user.setAvatar("/img/userAvatar/DefaultAvatar.png");
         //采用md5加密
-        user.setPassword(DigestUtils.md5DigestAsHex(userRegisterDTO.getPassword().getBytes(StandardCharsets.UTF_8)));
+        user.setPassword(DigestUtils.md5DigestAsHex((md5encryptAddSaltValue+userRegisterDTO.getPassword()).getBytes(StandardCharsets.UTF_8)));
         //TODO:头像位置待添加
         //新增返回的用户id
         userMapper.insert(user);

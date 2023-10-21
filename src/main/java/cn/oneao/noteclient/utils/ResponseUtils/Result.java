@@ -1,4 +1,4 @@
-package cn.oneao.noteclient.utils;
+package cn.oneao.noteclient.utils.ResponseUtils;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
 import lombok.Data;

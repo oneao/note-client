@@ -4,13 +4,13 @@ import cn.oneao.noteclient.enums.ResponseEnums;
 import cn.oneao.noteclient.pojo.dto.UserLoginDTO;
 import cn.oneao.noteclient.pojo.dto.UserRegisterDTO;
 import cn.oneao.noteclient.pojo.entity.User;
-import cn.oneao.noteclient.pojo.entity.log.SqlActionLog;
 import cn.oneao.noteclient.service.UserLogService;
 import cn.oneao.noteclient.service.UserService;
-import cn.oneao.noteclient.utils.GlobalThreadLocalUtils.GlobalObject;
-import cn.oneao.noteclient.utils.GlobalThreadLocalUtils.GlobalObjectUtil;
-import cn.oneao.noteclient.utils.Result;
-import cn.oneao.noteclient.utils.sendEmailUtils.SendRegisterEmailUtil;
+import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
+import cn.oneao.noteclient.utils.RedisCache;
+import cn.oneao.noteclient.utils.ResponseUtils.PageResult;
+import cn.oneao.noteclient.utils.ResponseUtils.Result;
+import cn.oneao.noteclient.utils.SendEmailUtils.SendRegisterEmailUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 @RestController
@@ -31,7 +30,8 @@ public class UserController {
     private UserLogService userLogService;
     @Autowired
     private SendRegisterEmailUtil sendRegisterEmailUtil;
-
+    @Autowired
+    private RedisCache redisCache;
     /**
      * 登录
      * @param userLoginDTO 用户登录
@@ -58,6 +58,9 @@ public class UserController {
         if (!ObjectUtils.isEmpty(oneUser)){
             return Result.error(ResponseEnums.USER_REGISTER_EMAIL_EXIST);
         }
+        if(redisCache.hasKey(email)){
+            redisCache.deleteObject(email);
+        }
         boolean flag = sendRegisterEmailUtil.sendEmailVerificationCode(email);
         if(flag){
             return Result.success(ResponseEnums.USER_REGISTER_GET_CAPTCHA_SUCCESS);
@@ -82,9 +85,13 @@ public class UserController {
     @GetMapping("/signOut")
     public Result<Object> userSignOut(@RequestHeader(value = "id",required = true)Integer userId){
         if (!ObjectUtils.isEmpty(userId)){
+            if(ObjectUtils.isEmpty(UserContext.getUserId())){
+                UserContext.setUserId(userId);
+            }
             userLogService.saveSignOutLog(userId);
             return Result.success(ResponseEnums.USER_SIGN_OUT_SUCCESS);
         }
+        UserContext.removeUserId();
         return Result.error("传入数据为空");
     }
 }

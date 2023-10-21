@@ -2,8 +2,9 @@ package cn.oneao.noteclient.aspects;
 
 import cn.oneao.noteclient.mapper.SqlActionLogMapper;
 import cn.oneao.noteclient.pojo.entity.log.SqlActionLog;
-import cn.oneao.noteclient.utils.GlobalThreadLocalUtils.GlobalObject;
-import cn.oneao.noteclient.utils.GlobalThreadLocalUtils.GlobalObjectUtil;
+import cn.oneao.noteclient.utils.GlobalObjectUtils.GlobalObject;
+import cn.oneao.noteclient.utils.GlobalObjectUtils.GlobalObjectUtil;
+import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -15,9 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 @Aspect
@@ -53,8 +52,10 @@ public class SqlExecutionTimeAspect {
         sqlActionLog.setSqlInterfaceName(methodName);
         sqlActionLog.setExecutionTime(endTime - startTime);
         //获取用户id
-        Integer userId = globalObject.getUserId();
-        sqlActionLog.setUserId(userId);
+        if (!ObjectUtils.isEmpty(UserContext.getUserId())) {
+            int userId = (int) UserContext.getUserId();
+            sqlActionLog.setUserId(userId);
+        }
         //获取当前线程的sql语句
         List<String> sqlStatements = globalObject.getSqlStatements();
         //判空
@@ -76,7 +77,7 @@ public class SqlExecutionTimeAspect {
         GlobalObjectUtil.getInstance().removeObject();
         //移除后重新创建
         GlobalObject newGlobalObject = new GlobalObject();
-        newGlobalObject.setUserId(userId);
+        newGlobalObject.setUserId(0);
         newGlobalObject.setSqlStatements(new ArrayList<>());
         newGlobalObject.setSqlActionLog(new SqlActionLog());
         newGlobalObject.setSqlParams(new ArrayList<>());

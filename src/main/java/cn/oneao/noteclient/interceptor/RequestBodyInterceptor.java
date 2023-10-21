@@ -1,8 +1,8 @@
 package cn.oneao.noteclient.interceptor;
 
 import cn.oneao.noteclient.pojo.entity.log.SqlActionLog;
-import cn.oneao.noteclient.utils.GlobalThreadLocalUtils.GlobalObject;
-import cn.oneao.noteclient.utils.GlobalThreadLocalUtils.GlobalObjectUtil;
+import cn.oneao.noteclient.utils.GlobalObjectUtils.GlobalObject;
+import cn.oneao.noteclient.utils.GlobalObjectUtils.GlobalObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;

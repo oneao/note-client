@@ -1,4 +1,4 @@
-package cn.oneao.noteclient.utils.GlobalThreadLocalUtils;
+package cn.oneao.noteclient.utils.GlobalObjectUtils;
 
 import cn.oneao.noteclient.pojo.entity.log.SqlActionLog;
 import lombok.AllArgsConstructor;

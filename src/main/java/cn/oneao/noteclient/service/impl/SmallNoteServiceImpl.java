@@ -9,7 +9,7 @@ import cn.oneao.noteclient.pojo.vo.SmallNoteOneVO;
 import cn.oneao.noteclient.pojo.vo.SmallNoteVO;
 import cn.oneao.noteclient.service.NoteLogService;
 import cn.oneao.noteclient.service.SmallNoteService;
-import cn.oneao.noteclient.utils.PageResult;
+import cn.oneao.noteclient.utils.ResponseUtils.PageResult;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -153,6 +153,10 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
     public void addSmallNote(SmallNoteAddDTO smallNoteAddDTO) {
         SmallNote smallNote = new SmallNote();
         BeanUtils.copyProperties(smallNoteAddDTO,smallNote);
+        if (0 == smallNote.getIsPrompt()){
+            smallNote.setBeginTime(null);
+            smallNote.setEndTime(null);
+        }
         this.save(smallNote);
         //添加小记操作日志
         NoteLog noteLog = new NoteLog();
@@ -177,7 +181,6 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
         BeanUtils.copyProperties(smallNote,smallNoteOneVO);
         return smallNoteOneVO;
     }
-
     /**
      * 更新小记
      * @param smallNoteUpdateDTO 更新小记对象
@@ -202,8 +205,12 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
         //创建SmallNote对象
         SmallNote smallNote = new SmallNote();
         BeanUtils.copyProperties(smallNoteUpdateDTO,smallNote);
+        if (0 == smallNote.getIsPrompt()){
+            smallNote.setBeginTime(null);
+            smallNote.setEndTime(null);
+        }
         this.save(smallNote);
-        //添加日志
+        /* 添加日志 */
         NoteLog noteLog = new NoteLog();
         noteLog.setSmallNoteId(smallNote.getId());
         noteLog.setUserId(smallNote.getUserId());

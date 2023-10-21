@@ -2,16 +2,13 @@ package cn.oneao.noteclient.controller;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
 import cn.oneao.noteclient.pojo.dto.*;
-import cn.oneao.noteclient.pojo.entity.SmallNote;
 import cn.oneao.noteclient.pojo.vo.SmallNoteOneVO;
 import cn.oneao.noteclient.pojo.vo.SmallNoteVO;
 import cn.oneao.noteclient.service.SmallNoteService;
-import cn.oneao.noteclient.utils.PageResult;
-import cn.oneao.noteclient.utils.Result;
+import cn.oneao.noteclient.utils.ResponseUtils.PageResult;
+import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 
