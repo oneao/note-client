@@ -4,8 +4,8 @@ import cn.oneao.noteclient.enums.NoteActionEnums;
 import cn.oneao.noteclient.enums.ResponseEnums;
 import cn.oneao.noteclient.mapper.NoteMapper;
 import cn.oneao.noteclient.pojo.dto.NoteDeleteDTO;
+import cn.oneao.noteclient.pojo.dto.NoteLockPassWordDTO;
 import cn.oneao.noteclient.pojo.dto.NoteTopStatusDTO;
-import cn.oneao.noteclient.pojo.dto.NoteVerifyLockPassWordDTO;
 import cn.oneao.noteclient.pojo.entity.Note;
 import cn.oneao.noteclient.pojo.entity.log.NoteLog;
 import cn.oneao.noteclient.pojo.vo.NoteVO;
@@ -16,19 +16,14 @@ import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.sun.mail.smtp.DigestMD5;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.logging.Log;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -65,7 +60,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
     }
     //TODO:验证锁密码是否有效
     @Override
-    public Boolean verifyNoteLockPassword(NoteVerifyLockPassWordDTO noteVerifyLockPassWordDTO) {
+    public Boolean verifyNoteLockPassword(NoteLockPassWordDTO noteVerifyLockPassWordDTO) {
         int userId = UserContext.getUserId();
         Integer noteId = noteVerifyLockPassWordDTO.getNoteId();
         String lockPassword = noteVerifyLockPassWordDTO.getLockPassword();
@@ -126,7 +121,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
             return Result.error(ResponseEnums.PARAMETER_MISSING);
         }
         noteLogService.save(noteLog);
-        return Result.success(ResponseEnums.Note_DELETE_LOGIC_SUCCESS);
+        return Result.success(ResponseEnums.NOTE_DELETE_LOGIC_SUCCESS);
     }
     //新增笔记
     @Override
@@ -145,6 +140,65 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         noteLog.setAction(NoteActionEnums.USER_ADD_NOTE.getActionName());
         noteLog.setActionDesc(NoteActionEnums.USER_ADD_NOTE.getActionDesc());
         noteLogService.save(noteLog);
-        return Result.success(note.getId(),ResponseEnums.Note_ADD_SUCCESS);
+        return Result.success(note.getId(),ResponseEnums.NOTE_ADD_SUCCESS);
+    }
+    //获取笔记
+    @Override
+    public Result<Object> getNoteById(Integer noteId) {
+        if (ObjectUtils.isEmpty(noteId)){
+            return Result.error(ResponseEnums.PARAMETER_MISSING);
+        }
+        Note note = this.getById(noteId);
+        NoteVO noteVO = new NoteVO();
+        BeanUtils.copyProperties(note,noteVO);
+        return Result.success(noteVO);
+    }
+    //为笔记添加密码
+    @Override
+    @Transactional
+    public Result<Object> addNoteLockPassword(NoteLockPassWordDTO noteLockPassWordDTO) {
+        String lockPassword = noteLockPassWordDTO.getLockPassword();
+        Integer noteId = noteLockPassWordDTO.getNoteId();
+        LambdaUpdateWrapper<Note> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Note::getId,noteId);
+        updateWrapper.set(Note::getIsLock,1);
+        updateWrapper.set(Note::getLockPassword,lockPassword);
+        this.update(updateWrapper);
+        //日志
+        NoteLog noteLog = new NoteLog();
+        noteLog.setUserId(UserContext.getUserId());
+        noteLog.setNoteId(noteId);
+        noteLog.setAction(NoteActionEnums.USER_UPDATE_NOTE.getActionName());
+        noteLog.setActionDesc(NoteActionEnums.USER_UPDATE_NOTE.getActionDesc());
+        noteLogService.save(noteLog);
+        return Result.success(ResponseEnums.NOTE_ADD_LOCK_SUCCESS);
+    }
+    //彻底删除笔记密码
+    @Override
+    public Result<Object> completelyLiftedNoteLockPassword(NoteLockPassWordDTO noteLockPassWordDTO) {
+        Integer noteId = noteLockPassWordDTO.getNoteId();
+        String lockPassword = noteLockPassWordDTO.getLockPassword();
+        LambdaQueryWrapper<Note> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Note::getId,noteId);
+        queryWrapper.eq(Note::getIsLock,1);
+        queryWrapper.eq(Note::getLockPassword,lockPassword);
+        Note note = this.getOne(queryWrapper);
+        if (ObjectUtils.isEmpty(note)){
+            return Result.error(ResponseEnums.NOTE_VERIFY_LOCK_ERROR);
+        }
+        //更新
+        LambdaUpdateWrapper<Note> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Note::getId,noteId);
+        updateWrapper.set(Note::getIsLock,0);
+        updateWrapper.set(Note::getLockPassword,null);
+        this.update(updateWrapper);
+        //日志
+        NoteLog noteLog = new NoteLog();
+        noteLog.setUserId(UserContext.getUserId());
+        noteLog.setNoteId(noteId);
+        noteLog.setAction(NoteActionEnums.USER_UPDATE_NOTE.getActionName());
+        noteLog.setActionDesc(NoteActionEnums.USER_UPDATE_NOTE.getActionDesc());
+        noteLogService.save(noteLog);
+        return Result.success(ResponseEnums.NOTE_DELETE_LOCK_SUCCESS);
     }
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NoteVerifyLockPassWordDTO {
+public class NoteLockPassWordDTO {
     private Integer noteId;
     private String lockPassword;
 }

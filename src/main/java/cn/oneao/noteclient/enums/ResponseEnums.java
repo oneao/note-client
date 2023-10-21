@@ -29,9 +29,11 @@ public enum ResponseEnums {
     NOTE_VERIFY_LOCK_SUCCESS(60008,"笔记密码正确"),
     NOTE_VERIFY_LOCK_ERROR(60009,"笔记密码错误"),
     NOTE_TOP_UPDATE_SUCCESS(60010,"笔记置顶状态修改成功"),
-    Note_DELETE_LOGIC_SUCCESS(60011,"删除成功,可在回收站内恢复"),
-    Note_DELETE_COMPLETE_SUCCESS(60012,"删除成功,注意无法恢复!"),
-    Note_ADD_SUCCESS(60013,"新增笔记成功!");
+    NOTE_DELETE_LOGIC_SUCCESS(60011,"删除成功,可在回收站内恢复"),
+    NOTE_DELETE_COMPLETE_SUCCESS(60012,"删除成功,注意无法恢复!"),
+    NOTE_ADD_SUCCESS(60013,"新增笔记成功!"),
+    NOTE_ADD_LOCK_SUCCESS(60014,"为该笔记添加密码成功!"),
+    NOTE_DELETE_LOCK_SUCCESS(60015,"删除笔记密码成功!");
     private final Integer code;   //响应码
     private final String msg; //相应信息
 }

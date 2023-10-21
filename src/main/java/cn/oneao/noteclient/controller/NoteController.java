@@ -2,8 +2,8 @@ package cn.oneao.noteclient.controller;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
 import cn.oneao.noteclient.pojo.dto.NoteDeleteDTO;
+import cn.oneao.noteclient.pojo.dto.NoteLockPassWordDTO;
 import cn.oneao.noteclient.pojo.dto.NoteTopStatusDTO;
-import cn.oneao.noteclient.pojo.dto.NoteVerifyLockPassWordDTO;
 import cn.oneao.noteclient.pojo.vo.NoteVO;
 import cn.oneao.noteclient.service.NoteService;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
@@ -35,7 +35,7 @@ public class NoteController {
      * @return 返回验证成功或失败。
      */
     @PostMapping("/verifyNoteLockPassword")
-    public Result<Object> verifyNoteLockPassword(@RequestBody NoteVerifyLockPassWordDTO noteVerifyLockPassWordDTO) {
+    public Result<Object> verifyNoteLockPassword(@RequestBody NoteLockPassWordDTO noteVerifyLockPassWordDTO) {
         Boolean flag = noteService.verifyNoteLockPassword(noteVerifyLockPassWordDTO);
         if (flag) {
             //密码正确
@@ -44,6 +44,16 @@ public class NoteController {
             //密码错误
             return Result.success(ResponseEnums.NOTE_VERIFY_LOCK_ERROR);
         }
+    }
+
+    /**
+     * 彻底删除笔记密码
+     * @param noteLockPassWordDTO 验证密码对象
+     * @return 返回验证成功或失败
+     */
+    @PutMapping("/completelyLiftedNoteLockPassword")
+    public Result<Object> completelyLiftedNoteLockPassword(@RequestBody NoteLockPassWordDTO noteLockPassWordDTO){
+        return noteService.completelyLiftedNoteLockPassword(noteLockPassWordDTO);
     }
     /**
      * 修改笔记的置顶状态
@@ -72,5 +82,22 @@ public class NoteController {
     public Result<Integer> addNote(){
         return noteService.addNote();
     }
-
+    /**
+     * 根据id获取单个笔记对象
+     * @param noteId 笔记id
+     * @return 返回一个笔记对象
+     */
+    @GetMapping("/getOneNote")
+    public Result<Object> getNoteById(@RequestParam("noteId")Integer noteId){
+        return noteService.getNoteById(noteId);
+    }
+    /**
+     * 为笔记添加密码
+     * @param noteLockPassWordDTO 笔记密码对象
+     * @return 返回正确信息
+     */
+    @PostMapping("/addNoteLockPassword")
+    public Result<Object> addNoteLockPassword(@RequestBody NoteLockPassWordDTO noteLockPassWordDTO){
+        return noteService.addNoteLockPassword(noteLockPassWordDTO);
+    }
 }
