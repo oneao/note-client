@@ -52,7 +52,12 @@ logging:
 mail:
   fromMail:
     fromAddress: hi_itao@163.com
-#二次加盐
+#对登录密码二次加盐
 md5encrypt:
   addSalt:
     value: one_ao
+minio:
+  endpoint: http://127.0.0.1:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucketName: note-bucket

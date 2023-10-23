@@ -1,18 +1,15 @@
 package cn.oneao.noteclient.controller;
 
-import cn.oneao.noteclient.constant.FileConstants;
 import cn.oneao.noteclient.pojo.entity.User;
 import cn.oneao.noteclient.service.UserService;
 import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
+import cn.oneao.noteclient.utils.MinioUtil;
 import cn.oneao.noteclient.utils.ResponseUtils.Image;
 import cn.oneao.noteclient.utils.ResponseUtils.ImageResult;
-import cn.oneao.noteclient.utils.ResponseUtils.PageResult;
-import cn.oneao.noteclient.utils.ResponseUtils.Result;
-import com.sun.mail.smtp.DigestMD5;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.DigestUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +27,24 @@ import java.util.UUID;
 public class ImageController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private MinioUtil MinioUtil;
+    @Value("${minio.endpoint}")
+    private String address;
+    @Value("${minio.bucketName}")
+    private String bucketName;
     @PostMapping("/upload")
+    public ImageResult uploadImage(@RequestParam("file") MultipartFile multipartFile){
+        String fileName = MinioUtil.upload(multipartFile);
+        String url = address + "/" + bucketName + "/" + fileName;
+        Image image = new Image();
+        image.setUrl(url);
+        ImageResult imageResult = new ImageResult();
+        imageResult.setErrno(0);
+        imageResult.setData(image);
+        return imageResult;
+    }
+    //@PostMapping("/upload")
     public ImageResult uploadImage(@RequestParam("file") MultipartFile multipartFile, HttpServletRequest httpServletRequest){
         String originalFilename = multipartFile.getOriginalFilename();
         String suffix = "";
@@ -63,4 +76,5 @@ public class ImageController {
         }
         return imageResult;
     }
+
 }
