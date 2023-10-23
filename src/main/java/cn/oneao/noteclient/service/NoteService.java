@@ -3,6 +3,7 @@ package cn.oneao.noteclient.service;
 import cn.oneao.noteclient.pojo.dto.NoteDeleteDTO;
 import cn.oneao.noteclient.pojo.dto.NoteLockPassWordDTO;
 import cn.oneao.noteclient.pojo.dto.NoteTopStatusDTO;
+import cn.oneao.noteclient.pojo.dto.NoteUpdateContentDTO;
 import cn.oneao.noteclient.pojo.entity.Note;
 import cn.oneao.noteclient.pojo.vo.NoteVO;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
@@ -27,4 +28,8 @@ public interface NoteService extends IService<Note> {
     Result<Object> addNoteLockPassword(NoteLockPassWordDTO noteLockPassWordDTO);
     //彻底删除笔记密码
     Result<Object> completelyLiftedNoteLockPassword(NoteLockPassWordDTO noteLockPassWordDTO);
+    //移除redis中的key
+    Result<Object> removeAccessToNote(Integer noteId);
+    //更新笔记
+    Result<Object> updateNoteContent(NoteUpdateContentDTO noteUpdateContentDTO);
 }

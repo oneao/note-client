@@ -33,7 +33,9 @@ public enum ResponseEnums {
     NOTE_DELETE_COMPLETE_SUCCESS(60012,"删除成功,注意无法恢复!"),
     NOTE_ADD_SUCCESS(60013,"新增笔记成功!"),
     NOTE_ADD_LOCK_SUCCESS(60014,"为该笔记添加密码成功!"),
-    NOTE_DELETE_LOCK_SUCCESS(60015,"删除笔记密码成功!");
+    NOTE_DELETE_LOCK_SUCCESS(60015,"删除笔记密码成功!"),
+    NOTE_NEED_PASSWORD(60016,"该笔记需要密码访问"),
+    NOTE_UPDATE_SUCCESS(60017,"更新成功");
     private final Integer code;   //响应码
     private final String msg; //相应信息
 }

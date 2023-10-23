@@ -6,12 +6,14 @@ import cn.oneao.noteclient.mapper.NoteMapper;
 import cn.oneao.noteclient.pojo.dto.NoteDeleteDTO;
 import cn.oneao.noteclient.pojo.dto.NoteLockPassWordDTO;
 import cn.oneao.noteclient.pojo.dto.NoteTopStatusDTO;
+import cn.oneao.noteclient.pojo.dto.NoteUpdateContentDTO;
 import cn.oneao.noteclient.pojo.entity.Note;
 import cn.oneao.noteclient.pojo.entity.log.NoteLog;
 import cn.oneao.noteclient.pojo.vo.NoteVO;
 import cn.oneao.noteclient.service.NoteLogService;
 import cn.oneao.noteclient.service.NoteService;
 import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
+import cn.oneao.noteclient.utils.RedisCache;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -19,6 +21,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -33,6 +36,8 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
     private NoteMapper noteMapper;
     @Autowired
     private NoteLogService noteLogService;
+    @Autowired
+    private RedisCache redisCache;
     //获取笔记信息
     @Override
     public List<NoteVO> getNoteInfo() {
@@ -67,7 +72,13 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         LambdaQueryWrapper<Note> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Note::getId,noteId).eq(Note::getUserId,userId).eq(Note::getLockPassword,lockPassword);
         Note noteOne = this.getOne(queryWrapper);
-        return !ObjectUtils.isEmpty(noteOne);
+        if (!ObjectUtils.isEmpty(noteOne)){
+            String key = "temporary_access_note_token:"+userId+"-"+noteId;
+            String value = "";
+            redisCache.setCacheObject(key,value);
+            return true;
+        }
+        return false;
     }
     //修改笔记的置顶状态
     @Override
@@ -149,6 +160,15 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
             return Result.error(ResponseEnums.PARAMETER_MISSING);
         }
         Note note = this.getById(noteId);
+        //如果上锁
+        if (note.getIsLock() == 1){
+            String key = "temporary_access_note_token:"+UserContext.getUserId()+"-"+noteId;
+            boolean flag = redisCache.hasKey(key);
+            if (!flag){
+                //如果没有进行密码验证，则无法访问到该笔记
+                return Result.error(ResponseEnums.NOTE_NEED_PASSWORD);
+            }
+        }
         NoteVO noteVO = new NoteVO();
         BeanUtils.copyProperties(note,noteVO);
         return Result.success(noteVO);
@@ -187,6 +207,14 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
             return Result.error(ResponseEnums.NOTE_VERIFY_LOCK_ERROR);
         }
         //更新
+        if (note.getIsLock() == 1){
+            String key = "temporary_access_note_token:"+UserContext.getUserId()+"-"+noteId;
+            //如果上锁,就需要移除
+            if (redisCache.hasKey(key)){
+                //删除
+                redisCache.deleteObject(key);
+            }
+        }
         LambdaUpdateWrapper<Note> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Note::getId,noteId);
         updateWrapper.set(Note::getIsLock,0);
@@ -200,5 +228,42 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         noteLog.setActionDesc(NoteActionEnums.USER_UPDATE_NOTE.getActionDesc());
         noteLogService.save(noteLog);
         return Result.success(ResponseEnums.NOTE_DELETE_LOCK_SUCCESS);
+    }
+    //移除redis中存放的临时key
+    @Override
+    public Result<Object> removeAccessToNote(Integer noteId) {
+        Note note = this.getById(noteId);
+        Integer isLock = note.getIsLock();
+        if (isLock == 1){
+            String key = "temporary_access_note_token:"+UserContext.getUserId()+"-"+noteId;
+            //如果上锁,就需要移除
+            if (redisCache.hasKey(key)){
+                //删除
+                redisCache.deleteObject(key);
+            }
+        }
+        return Result.success();
+    }
+    @Transactional
+    @Override
+    public Result<Object> updateNoteContent(NoteUpdateContentDTO noteUpdateContentDTO) {
+        Integer noteId = noteUpdateContentDTO.getNoteId();
+        String noteBody = noteUpdateContentDTO.getNoteBody();
+        String noteContent = noteUpdateContentDTO.getNoteContent();
+        if (ObjectUtils.isEmpty(noteId)){
+            return Result.error(ResponseEnums.PARAMETER_MISSING);
+        }
+        LambdaUpdateWrapper<Note> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Note::getId,noteId);
+        updateWrapper.set(Note::getNoteBody,noteBody);
+        updateWrapper.set(Note::getNoteContent,noteContent);
+        this.update(updateWrapper);
+        NoteLog noteLog = new NoteLog();
+        noteLog.setUserId(UserContext.getUserId());
+        noteLog.setNoteId(noteId);
+        noteLog.setAction(NoteActionEnums.USER_UPDATE_NOTE.getActionName());
+        noteLog.setActionDesc(NoteActionEnums.USER_UPDATE_NOTE.getActionDesc());
+        noteLogService.save(noteLog);
+        return Result.success(ResponseEnums.NOTE_UPDATE_SUCCESS);
     }
 }

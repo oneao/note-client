@@ -4,6 +4,7 @@ import cn.oneao.noteclient.enums.ResponseEnums;
 import cn.oneao.noteclient.pojo.dto.NoteDeleteDTO;
 import cn.oneao.noteclient.pojo.dto.NoteLockPassWordDTO;
 import cn.oneao.noteclient.pojo.dto.NoteTopStatusDTO;
+import cn.oneao.noteclient.pojo.dto.NoteUpdateContentDTO;
 import cn.oneao.noteclient.pojo.vo.NoteVO;
 import cn.oneao.noteclient.service.NoteService;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
@@ -45,7 +46,6 @@ public class NoteController {
             return Result.success(ResponseEnums.NOTE_VERIFY_LOCK_ERROR);
         }
     }
-
     /**
      * 彻底删除笔记密码
      * @param noteLockPassWordDTO 验证密码对象
@@ -54,6 +54,15 @@ public class NoteController {
     @PutMapping("/completelyLiftedNoteLockPassword")
     public Result<Object> completelyLiftedNoteLockPassword(@RequestBody NoteLockPassWordDTO noteLockPassWordDTO){
         return noteService.completelyLiftedNoteLockPassword(noteLockPassWordDTO);
+    }
+    /**
+     * 判断redis中是否有笔记的临时访问权限，如果有的话，则删除
+     * @param noteId 笔记id
+     * @return 不返回信息，进行检查而已
+     */
+    @GetMapping("/removeAccessToNote/{noteId}")
+    public Result<Object> removeAccessToNote(@PathVariable Integer noteId){
+        return noteService.removeAccessToNote(noteId);
     }
     /**
      * 修改笔记的置顶状态
@@ -66,8 +75,8 @@ public class NoteController {
         return Result.success(ResponseEnums.NOTE_TOP_UPDATE_SUCCESS);
     }
     /**
-     * 删除小记
-     * @param noteDeleteDTO 删除小记对象
+     * 删除笔记
+     * @param noteDeleteDTO 删除笔记对象
      * @return 响应删除成功与否
      */
     @DeleteMapping("/deleteNote")
@@ -87,8 +96,8 @@ public class NoteController {
      * @param noteId 笔记id
      * @return 返回一个笔记对象
      */
-    @GetMapping("/getOneNote")
-    public Result<Object> getNoteById(@RequestParam("noteId")Integer noteId){
+    @GetMapping("/getOneNote/{noteId}")
+    public Result<Object> getNoteById(@PathVariable("noteId") Integer noteId){
         return noteService.getNoteById(noteId);
     }
     /**
@@ -99,5 +108,9 @@ public class NoteController {
     @PostMapping("/addNoteLockPassword")
     public Result<Object> addNoteLockPassword(@RequestBody NoteLockPassWordDTO noteLockPassWordDTO){
         return noteService.addNoteLockPassword(noteLockPassWordDTO);
+    }
+    @PutMapping("/updateNoteContent")
+    public Result<Object> updateNoteContent(@RequestBody NoteUpdateContentDTO noteUpdateContentDTO){
+        return noteService.updateNoteContent(noteUpdateContentDTO);
     }
 }

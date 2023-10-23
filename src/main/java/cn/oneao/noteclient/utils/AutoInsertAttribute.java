@@ -25,4 +25,5 @@ public class AutoInsertAttribute implements MetaObjectHandler {
         this.setFieldValByName("updateTime", new Date(), metaObject);
         this.setFieldValByName("isCreateNew",1,metaObject);
     }
+
 }

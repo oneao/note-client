@@ -69,7 +69,7 @@ public class SmallNoteController {
      * @return 返回该小记的信息
      */
     @GetMapping("/getOneSmallNote")
-    public Result<Object> getOneSmallNote(@RequestParam("id")Integer smallNoteId){
+    public Result<Object> getOneSmallNote(@RequestParam("id")Integer smallNoteId) {
         SmallNoteOneVO oneSmallNote = smallNoteService.getOneSmallNote(smallNoteId);
         return Result.success(oneSmallNote);
     }

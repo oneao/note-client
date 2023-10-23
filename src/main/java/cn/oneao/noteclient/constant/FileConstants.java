@@ -6,4 +6,5 @@ public class FileConstants {
     //    public static String ASSETS_PATH = System.getProperty("user.dir");
     public static String ASSETS_PATH = new File(System.getProperty("user.dir")).getParent();
     public static String USER_AVATAR = "file:" + ASSETS_PATH + "/img/userAvatar/";
+    public static String USER_NOTE_IMAGE = "file:" + ASSETS_PATH + "/img/userNoteImage/";
 }
