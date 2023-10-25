@@ -1,14 +1,13 @@
 package cn.oneao.noteclient.controller;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
-import cn.oneao.noteclient.pojo.dto.UserLoginDTO;
-import cn.oneao.noteclient.pojo.dto.UserRegisterDTO;
+import cn.oneao.noteclient.pojo.dto.user.UserLoginDTO;
+import cn.oneao.noteclient.pojo.dto.user.UserRegisterDTO;
 import cn.oneao.noteclient.pojo.entity.User;
 import cn.oneao.noteclient.service.UserLogService;
 import cn.oneao.noteclient.service.UserService;
 import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
 import cn.oneao.noteclient.utils.RedisCache;
-import cn.oneao.noteclient.utils.ResponseUtils.PageResult;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import cn.oneao.noteclient.utils.SendEmailUtils.SendRegisterEmailUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

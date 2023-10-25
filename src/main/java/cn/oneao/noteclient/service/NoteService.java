@@ -1,10 +1,7 @@
 package cn.oneao.noteclient.service;
 
-import cn.oneao.noteclient.pojo.dto.NoteDeleteDTO;
-import cn.oneao.noteclient.pojo.dto.NoteLockPassWordDTO;
-import cn.oneao.noteclient.pojo.dto.NoteTopStatusDTO;
-import cn.oneao.noteclient.pojo.dto.NoteUpdateContentDTO;
-import cn.oneao.noteclient.pojo.entity.Note;
+import cn.oneao.noteclient.pojo.dto.note.*;
+import cn.oneao.noteclient.pojo.entity.note.Note;
 import cn.oneao.noteclient.pojo.vo.NoteVO;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -32,4 +29,7 @@ public interface NoteService extends IService<Note> {
     Result<Object> removeAccessToNote(Integer noteId);
     //更新笔记
     Result<Object> updateNoteContent(NoteUpdateContentDTO noteUpdateContentDTO);
+    //更新笔记的收藏状态
+    Result<Object> updateNoteCollection(NoteUpdateCollectionDTO updateCollectionDTO);
+
 }

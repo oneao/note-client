@@ -1,6 +1,6 @@
 package cn.oneao.noteclient.mapper;
 
-import cn.oneao.noteclient.pojo.entity.Note;
+import cn.oneao.noteclient.pojo.entity.note.Note;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

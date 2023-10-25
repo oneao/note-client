@@ -1,6 +1,6 @@
 package cn.oneao.noteclient.service;
 
-import cn.oneao.noteclient.pojo.dto.*;
+import cn.oneao.noteclient.pojo.dto.smallNote.*;
 import cn.oneao.noteclient.pojo.entity.SmallNote;
 import cn.oneao.noteclient.pojo.vo.SmallNoteOneVO;
 import cn.oneao.noteclient.pojo.vo.SmallNoteVO;

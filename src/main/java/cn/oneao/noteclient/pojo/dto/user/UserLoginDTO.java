@@ -1,4 +1,4 @@
-package cn.oneao.noteclient.pojo.dto;
+package cn.oneao.noteclient.pojo.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NoteLockPassWordDTO {
-    private Integer noteId;
-    private String lockPassword;
+public class UserLoginDTO {
+    private String email;
+    private String password;
 }

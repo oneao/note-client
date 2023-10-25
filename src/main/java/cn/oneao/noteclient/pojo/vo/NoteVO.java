@@ -16,6 +16,7 @@ public class NoteVO {
     private String noteTags;//笔记标签
     private Integer isTop;//是否置顶
     private Integer isLock;//是否加锁
-    private Integer isCreateNew;//是否新建
+    private Integer isNewBuild;//是否新建(可以直接删除，不存在回收在中)
+    private Integer isCollection;//(0:未收藏，1:收藏)
     private Date updateTime;
 }

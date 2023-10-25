@@ -3,11 +3,8 @@ package cn.oneao.noteclient.service.impl;
 import cn.oneao.noteclient.enums.NoteActionEnums;
 import cn.oneao.noteclient.enums.ResponseEnums;
 import cn.oneao.noteclient.mapper.NoteMapper;
-import cn.oneao.noteclient.pojo.dto.NoteDeleteDTO;
-import cn.oneao.noteclient.pojo.dto.NoteLockPassWordDTO;
-import cn.oneao.noteclient.pojo.dto.NoteTopStatusDTO;
-import cn.oneao.noteclient.pojo.dto.NoteUpdateContentDTO;
-import cn.oneao.noteclient.pojo.entity.Note;
+import cn.oneao.noteclient.pojo.dto.note.*;
+import cn.oneao.noteclient.pojo.entity.note.Note;
 import cn.oneao.noteclient.pojo.entity.log.NoteLog;
 import cn.oneao.noteclient.pojo.vo.NoteVO;
 import cn.oneao.noteclient.service.NoteLogService;
@@ -21,7 +18,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -97,7 +93,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
             //其他
             return;
         }
-        this.update(updateWrapper);
+        this.update(new Note(),updateWrapper);
     }
     //删除笔记
     @Override
@@ -105,8 +101,8 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
     public Result<Object> deleteNote(NoteDeleteDTO noteDeleteDTO) {
         Integer noteId = noteDeleteDTO.getNoteId();
         Integer deleteType = noteDeleteDTO.getDeleteType();
-        Integer isCreateNew = noteDeleteDTO.getIsCreateNew();
-        if (ObjectUtils.isEmpty(noteId) || ObjectUtils.isEmpty(deleteType) || ObjectUtils.isEmpty(isCreateNew)){
+        Integer isNewBuild = noteDeleteDTO.getIsNewBuild();
+        if (ObjectUtils.isEmpty(noteId) || ObjectUtils.isEmpty(deleteType) || ObjectUtils.isEmpty(isNewBuild)){
             return Result.error(ResponseEnums.PARAMETER_MISSING);
         }
         //添加用户操作日志
@@ -114,7 +110,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         noteLog.setNoteId(noteId);
         noteLog.setUserId(UserContext.getUserId());
         if (deleteType == 1){
-            if (isCreateNew == 0){//如果是新建的，那么就彻底删除
+            if (isNewBuild == 0){//如果是新建的，那么就彻底删除
                 //彻底删除
                 noteMapper.completeDeleteNewCreateNote(noteId);
             }else {//如果不是新建的，那么就彻底删除
@@ -140,8 +136,6 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
     public Result<Integer> addNote() {
         //新增笔记
         Note note = new Note();
-        note.setIsLock(0);
-        note.setIsTop(0);
         note.setUserId(UserContext.getUserId());
         this.save(note);
         //日志
@@ -160,6 +154,9 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
             return Result.error(ResponseEnums.PARAMETER_MISSING);
         }
         Note note = this.getById(noteId);
+        if (ObjectUtils.isEmpty(note)){
+            return Result.error("暂无笔记哦!");
+        }
         //如果上锁
         if (note.getIsLock() == 1){
             String key = "temporary_access_note_token:"+UserContext.getUserId()+"-"+noteId;
@@ -183,7 +180,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         updateWrapper.eq(Note::getId,noteId);
         updateWrapper.set(Note::getIsLock,1);
         updateWrapper.set(Note::getLockPassword,lockPassword);
-        this.update(updateWrapper);
+        this.update(new Note(),updateWrapper);
         //日志
         NoteLog noteLog = new NoteLog();
         noteLog.setUserId(UserContext.getUserId());
@@ -244,6 +241,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         }
         return Result.success();
     }
+    //更新笔记收藏内容
     @Transactional
     @Override
     public Result<Object> updateNoteContent(NoteUpdateContentDTO noteUpdateContentDTO) {
@@ -257,7 +255,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         updateWrapper.eq(Note::getId,noteId);
         updateWrapper.set(Note::getNoteBody,noteBody);
         updateWrapper.set(Note::getNoteContent,noteContent);
-        this.update(updateWrapper);
+        this.update(new Note(),updateWrapper);
         NoteLog noteLog = new NoteLog();
         noteLog.setUserId(UserContext.getUserId());
         noteLog.setNoteId(noteId);
@@ -266,4 +264,21 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         noteLogService.save(noteLog);
         return Result.success(ResponseEnums.NOTE_UPDATE_SUCCESS);
     }
+    //更新笔记的指定状态
+    @Override
+    public Result<Object> updateNoteCollection(NoteUpdateCollectionDTO updateCollectionDTO) {
+        Integer noteId = updateCollectionDTO.getNoteId();
+        Integer isCollection = updateCollectionDTO.getIsCollection();
+        LambdaUpdateWrapper<Note> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Note::getId,noteId);
+        updateWrapper.set(Note::getIsCollection,isCollection);
+        if (isCollection == 1){
+            return Result.success(ResponseEnums.NOTE_COLLECTION_SUCCESS);
+        }else if (isCollection == 0){
+            return Result.success(ResponseEnums.NOTE_COLLECTION_CANCEL_SUCCESS);
+        }
+        this.update(new Note(),updateWrapper);
+        return Result.error(ResponseEnums.PARAMETER_MISSING);
+    }
+
 }

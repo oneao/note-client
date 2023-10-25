@@ -35,7 +35,21 @@ public enum ResponseEnums {
     NOTE_ADD_LOCK_SUCCESS(60014,"为该笔记添加密码成功!"),
     NOTE_DELETE_LOCK_SUCCESS(60015,"删除笔记密码成功!"),
     NOTE_NEED_PASSWORD(60016,"该笔记需要密码访问"),
-    NOTE_UPDATE_SUCCESS(60017,"更新成功");
+    NOTE_UPDATE_SUCCESS(60017,"更新成功"),
+    NOTE_COLLECTION_SUCCESS(60018,"收藏笔记成功"),
+    NOTE_COLLECTION_CANCEL_SUCCESS(60019,"取消收藏笔记成功"),
+    NOTE_SHARE_SUCCESS(60020,"分享笔记成功"),
+    NOTE_SHARE_ERROR(60021,"该笔记已分享,如需要取消,请去分享中心!"),
+    NOTE_SHARE_OVER(60022,"该笔记分享不存在已过期,无法查看!"),
+    NOTE_SHARE_NOT_EXISTS(60023,"不存在该分享笔记"),
+    NOTE_SHARE_NEED_LOCK(60024,"该分享笔记需要锁"),
+    NOTE_SHARE_NOT_NEED_LOCK(60025,"该笔记不需要锁"),
+    NOTE_SHARE_LOCK_PASSWORD_ERROR(60026,"笔记分享密码错误，无法访问"),
+    NOTE_SHARE_GET_SUCCESS(60027,"获取分享笔记成功!"),
+    NOTE_SHARE_ALLOW_ADD(60028,"允许添加分享笔记"),
+    NOTE_SHARE_NOT_ALLOW_ADD(60029,"该笔记已经分享过了哦,请勿重新分享!"),
+    NOTE_SHARE_LICK_SUCCESS(60030,"点赞成功"),
+    NOTE_SHARE_LICK_CANCEL_SUCCESS(60031,"取消点赞成功");
     private final Integer code;   //响应码
     private final String msg; //相应信息
 }

@@ -23,7 +23,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         LoginInterceptor loginInterceptor = new LoginInterceptor();
         //请求拦截路径
-        String[] addPath = {"/user/login","/user/getCode","/user/register","/user/signOut","/img/**"};
+        String[] addPath = {"/user/login","/user/getCode","/user/register","/user/signOut","/img/**"
+        ,"/noteShare/getShareNoteIsLock","/noteShare/getShareNote","/noteShare/goToLick"};
         registry.addInterceptor(loginInterceptor)
                 //这里配置要拦截的路径
                 .addPathPatterns("/**")

@@ -2,7 +2,7 @@ package cn.oneao.noteclient.service.impl;
 
 import cn.oneao.noteclient.enums.NoteActionEnums;
 import cn.oneao.noteclient.mapper.SmallNoteMapper;
-import cn.oneao.noteclient.pojo.dto.*;
+import cn.oneao.noteclient.pojo.dto.smallNote.*;
 import cn.oneao.noteclient.pojo.entity.log.NoteLog;
 import cn.oneao.noteclient.pojo.entity.SmallNote;
 import cn.oneao.noteclient.pojo.vo.SmallNoteOneVO;

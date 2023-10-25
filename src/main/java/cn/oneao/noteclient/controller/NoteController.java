@@ -1,10 +1,7 @@
 package cn.oneao.noteclient.controller;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
-import cn.oneao.noteclient.pojo.dto.NoteDeleteDTO;
-import cn.oneao.noteclient.pojo.dto.NoteLockPassWordDTO;
-import cn.oneao.noteclient.pojo.dto.NoteTopStatusDTO;
-import cn.oneao.noteclient.pojo.dto.NoteUpdateContentDTO;
+import cn.oneao.noteclient.pojo.dto.note.*;
 import cn.oneao.noteclient.pojo.vo.NoteVO;
 import cn.oneao.noteclient.service.NoteService;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
@@ -109,8 +106,23 @@ public class NoteController {
     public Result<Object> addNoteLockPassword(@RequestBody NoteLockPassWordDTO noteLockPassWordDTO){
         return noteService.addNoteLockPassword(noteLockPassWordDTO);
     }
+    /**
+     * 更新笔记内容
+     * @param noteUpdateContentDTO 更新笔记内容体
+     * @return 返回更新成功
+     */
     @PutMapping("/updateNoteContent")
     public Result<Object> updateNoteContent(@RequestBody NoteUpdateContentDTO noteUpdateContentDTO){
         return noteService.updateNoteContent(noteUpdateContentDTO);
     }
+    /**
+     * 更新笔记的收藏状态
+     * @param updateCollectionDTO 收藏笔记对象
+     * @return 返回收藏成功与否
+     */
+    @PutMapping("/updateNoteCollection")
+    public Result<Object> updateNoteCollection(@RequestBody NoteUpdateCollectionDTO updateCollectionDTO){
+        return noteService.updateNoteCollection(updateCollectionDTO);
+    }
+
 }

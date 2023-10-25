@@ -17,13 +17,17 @@ public class AutoInsertAttribute implements MetaObjectHandler {
         this.setFieldValByName("status",0,metaObject);
         this.setFieldValByName("isDelete",0,metaObject);
         this.setFieldValByName("type",0,metaObject);
-        this.setFieldValByName("isCreateNew",0,metaObject);
+        this.setFieldValByName("isNewBuild",0,metaObject);
+        this.setFieldValByName("isCollection",0,metaObject);
+        this.setFieldValByName("isTop",0,metaObject);
+        this.setFieldValByName("isLock",0,metaObject);
+
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
         this.setFieldValByName("updateTime", new Date(), metaObject);
-        this.setFieldValByName("isCreateNew",1,metaObject);
+        this.setFieldValByName("isNewBuild",1,metaObject);
     }
 
 }

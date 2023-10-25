@@ -1,4 +1,4 @@
-package cn.oneao.noteclient.pojo.dto;
+package cn.oneao.noteclient.pojo.dto.smallNote;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

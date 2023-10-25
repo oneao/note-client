@@ -61,3 +61,6 @@ minio:
   accessKey: minioadmin
   secretKey: minioadmin
   bucketName: note-bucket
+front:
+  share:
+    address: http://localhost:5173/noteShare

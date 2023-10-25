@@ -3,8 +3,10 @@ package cn.oneao.noteclient.config;
 import cn.oneao.noteclient.interceptor.SqlStatementInterceptor;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.apache.ibatis.reflection.MetaObject;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,4 +35,5 @@ public class MybatisPlusConfig {
             configuration.addInterceptor(sqlStatementInterceptor);
         };
     }
+
 }
