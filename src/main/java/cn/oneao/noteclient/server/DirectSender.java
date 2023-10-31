@@ -1,0 +1,26 @@
+package cn.oneao.noteclient.server;
+
+import cn.oneao.noteclient.config.RabbitMQConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+@Slf4j
+public class DirectSender {
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+    /**
+     * 向RabbitMQ队列中发送消息，方便后面客户端可以从队列中读取该消息
+     * <p>
+     * 也可以用来代替客户端向队列中发送消息，我不会写前端连接rabbitmq的代码，就用这个接口代替了。或者在RabbitMQ的管理面板中手动输入数据
+     *
+     * @param msg
+     */
+    public void sendDirect(String msg) {
+        rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.ROUTING_KEY, msg);
+    }
+}

@@ -17,6 +17,7 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -90,6 +91,9 @@ public class SqlStatementInterceptor implements Interceptor {
                     continue;
                 }
                 String propertyName = parameterMapping.getProperty();
+                if (ObjectUtils.isEmpty(parameterObject)){
+                    return invocation.proceed();
+                }
                 if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
                     parameter = getParameterValue(parameterObject);
                 } else if (newMetaObject.hasGetter(propertyName)) {

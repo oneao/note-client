@@ -34,4 +34,5 @@ public class Note {
     private Date updateTime;//更新时间
     @TableField(fill = FieldFill.INSERT)
     private Integer isDelete;//是否删除
+    private String noteBackgroundImage;//背景图片
 }

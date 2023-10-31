@@ -19,4 +19,5 @@ public class NoteShareVO {
     private Integer noteLikeNumber;//该笔记的点赞数量
     private Date noteShareThatTime;//分享的当时时间
     private Integer noteShareVisitNumber;//访问量
+    private Integer isLike;//该ip是否点赞
 }

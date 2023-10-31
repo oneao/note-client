@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("user_log")
+@ToString
 public class UserLog {
     @TableId(type = IdType.AUTO)
     private Integer id;

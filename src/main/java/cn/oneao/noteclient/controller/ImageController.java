@@ -33,6 +33,7 @@ public class ImageController {
     private String address;
     @Value("${minio.bucketName}")
     private String bucketName;
+    //上传的是用户编辑笔记中的的图片
     @PostMapping("/upload")
     public ImageResult uploadImage(@RequestParam("file") MultipartFile multipartFile){
         String fileName = MinioUtil.upload(multipartFile);
@@ -44,6 +45,7 @@ public class ImageController {
         imageResult.setData(image);
         return imageResult;
     }
+    @PostMapping("/")
     //@PostMapping("/upload")
     public ImageResult uploadImage(@RequestParam("file") MultipartFile multipartFile, HttpServletRequest httpServletRequest){
         String originalFilename = multipartFile.getOriginalFilename();

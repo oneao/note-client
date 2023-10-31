@@ -1,8 +1,7 @@
 package cn.oneao.noteclient.controller;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
-import cn.oneao.noteclient.pojo.dto.user.UserLoginDTO;
-import cn.oneao.noteclient.pojo.dto.user.UserRegisterDTO;
+import cn.oneao.noteclient.pojo.dto.user.*;
 import cn.oneao.noteclient.pojo.entity.User;
 import cn.oneao.noteclient.service.UserLogService;
 import cn.oneao.noteclient.service.UserService;
@@ -13,6 +12,7 @@ import cn.oneao.noteclient.utils.SendEmailUtils.SendRegisterEmailUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +31,8 @@ public class UserController {
     private SendRegisterEmailUtil sendRegisterEmailUtil;
     @Autowired
     private RedisCache redisCache;
+    @Value("${md5encrypt.addSalt.value}")
+    private String md5encryptAddSaltValue;
     /**
      * 登录
      * @param userLoginDTO 用户登录
@@ -38,11 +40,7 @@ public class UserController {
      */
     @PostMapping("/login")
     public Result<Object> userLogin(@RequestBody UserLoginDTO userLoginDTO){
-        Map<String, Object> map = userService.userLogin(userLoginDTO.getEmail(), userLoginDTO.getPassword());
-        if(map.isEmpty()){
-            return Result.success(ResponseEnums.USER_LOGIN_ERROR);
-        }
-        return Result.success(map,ResponseEnums.USER_LOGIN_SUCCESS);
+        return userService.userLogin(userLoginDTO.getEmail(), userLoginDTO.getPassword());
     }
     /**
      * 获取验证码
@@ -92,5 +90,58 @@ public class UserController {
         }
         UserContext.removeUserId();
         return Result.error("传入数据为空");
+    }
+
+    /**
+     * 获取用户的信息
+     * @return 返回用户的信息
+     */
+    @GetMapping("/getUserInfo")
+    public Result<Object> getUserInfo(){
+        return userService.getUserInfo();
+    }
+
+    /**
+     * 更新用户信息
+     * @param userUpdateDTO 头像 昵称
+     * @return 返回
+     */
+    @PutMapping("/updateUserMessage")
+    public Result<Object> updateUserMessage(@RequestBody UserUpdateDTO userUpdateDTO){
+        return userService.updateUserMessage(userUpdateDTO);
+    }
+
+    /**
+     * 获取用户的操作日志（时间线）
+     * @return 返回日志信息
+     */
+    @GetMapping("/getUserTimeLine")
+    public Result<Object> getUserTimeLine(){
+        return userService.getUserTimeLine();
+    }
+
+    /**
+     * 重置密码
+     * @param userResetPasswordDTO 原密码，新密码
+     * @return 返回
+     */
+    @PutMapping("/toResetPassword")
+    public Result<Object> toResetPassword(@RequestBody UserResetPasswordDTO userResetPasswordDTO){
+        return userService.toResetPassword(userResetPasswordDTO);
+    }
+
+    /**
+     * 获取验证码
+     * @param email 根据邮箱号获取验证码
+     * @return 返回获取成功或失败的信息
+     */
+    @GetMapping("/getForgetCode")
+    public Result<Object> getForgetCode(@RequestParam("email") String email){
+        return userService.getForgetCode(email);
+    }
+
+    @PutMapping("/updateForgetPassword")
+    public Result<Object> updateForgetPassword(@RequestBody UserForgetPasswordDTO userForgetPasswordDTO){
+        return userService.updateForgetPassword(userForgetPasswordDTO);
     }
 }

@@ -19,7 +19,7 @@ public class SendExpirationNoticeEmailUtil {
     @Autowired
     private TemplateEngine templateEngine;
 
-    public boolean sendEmailVerificationCode(String toEmail,String smallNoteTitle) {
+    public void sendEmailVerificationCode(String toEmail, String smallNoteTitle) {
         Context context = new Context();
         context.setVariable("smallNoteTitle",smallNoteTitle);
         //当前存放位置为resources包
@@ -34,7 +34,6 @@ public class SendExpirationNoticeEmailUtil {
             helper.setText(emailContent, true);
             mailSender.send(message);
             //设置过期时间为3分钟
-            return true;
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }

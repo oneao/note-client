@@ -25,11 +25,10 @@ public interface NoteService extends IService<Note> {
     Result<Object> addNoteLockPassword(NoteLockPassWordDTO noteLockPassWordDTO);
     //彻底删除笔记密码
     Result<Object> completelyLiftedNoteLockPassword(NoteLockPassWordDTO noteLockPassWordDTO);
-    //移除redis中的key
-    Result<Object> removeAccessToNote(Integer noteId);
     //更新笔记
     Result<Object> updateNoteContent(NoteUpdateContentDTO noteUpdateContentDTO);
     //更新笔记的收藏状态
     Result<Object> updateNoteCollection(NoteUpdateCollectionDTO updateCollectionDTO);
-
+    //更新用户的笔记信息
+    Result<Object> updateNoteMessage(NoteUpdateMessageDTO noteUpdateMessageDTO);
 }

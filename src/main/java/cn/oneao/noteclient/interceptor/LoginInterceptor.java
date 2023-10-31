@@ -23,6 +23,16 @@ public class LoginInterceptor implements HandlerInterceptor {
         if("OPTIONS".equalsIgnoreCase(method)){
             return true;
         }
+        if (request.getRequestURI().equals("/note/error")){
+            Result<Object> result = Result.error(ResponseEnums.UNKNOWN_ERROR);
+            String jsonString = JSONObject.toJSONString(result);
+            response.setContentType("application/json;charset=utf-8");
+            PrintWriter out = response.getWriter();
+            out.println(jsonString);
+            out.flush();
+            out.close();
+            return false;
+        }
         boolean flag = false;
         try {
             String userId = request.getHeader("id");

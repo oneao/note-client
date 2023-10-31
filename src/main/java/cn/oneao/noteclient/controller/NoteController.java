@@ -18,6 +18,7 @@ public class NoteController {
     @Autowired
     private NoteService noteService;
 
+
     /**
      * 获取当前登录用户的笔记信息
      * @return 返回笔记列表
@@ -26,6 +27,7 @@ public class NoteController {
     public Result<Object> getNoteInfo(){
         //获取当前用户id
         List<NoteVO> noteInfo = noteService.getNoteInfo();
+
         return Result.success(noteInfo);
     }
     /** 验证笔记是否正确
@@ -52,15 +54,7 @@ public class NoteController {
     public Result<Object> completelyLiftedNoteLockPassword(@RequestBody NoteLockPassWordDTO noteLockPassWordDTO){
         return noteService.completelyLiftedNoteLockPassword(noteLockPassWordDTO);
     }
-    /**
-     * 判断redis中是否有笔记的临时访问权限，如果有的话，则删除
-     * @param noteId 笔记id
-     * @return 不返回信息，进行检查而已
-     */
-    @GetMapping("/removeAccessToNote/{noteId}")
-    public Result<Object> removeAccessToNote(@PathVariable Integer noteId){
-        return noteService.removeAccessToNote(noteId);
-    }
+
     /**
      * 修改笔记的置顶状态
      * @param noteTopStatusDTO 笔记置顶对象
@@ -124,5 +118,13 @@ public class NoteController {
     public Result<Object> updateNoteCollection(@RequestBody NoteUpdateCollectionDTO updateCollectionDTO){
         return noteService.updateNoteCollection(updateCollectionDTO);
     }
-
+    /**
+     * 更新用户的笔记信息
+     * @param noteUpdateMessageDTO 标题 主题 标签 背景图片
+     * @return 返回
+     */
+    @PutMapping("/updateNoteMessage")
+    public Result<Object> updateNoteMessage(@RequestBody NoteUpdateMessageDTO noteUpdateMessageDTO){
+        return noteService.updateNoteMessage(noteUpdateMessageDTO);
+    }
 }

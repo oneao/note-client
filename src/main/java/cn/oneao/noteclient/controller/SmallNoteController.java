@@ -49,7 +49,13 @@ public class SmallNoteController {
     @DeleteMapping("/deleteSmallNote")
     public Result<Object> deleteSmallNote(@RequestBody SmallNoteDeleteDTO smallNoteDeleteDTO){
         smallNoteService.deleteSmallNote(smallNoteDeleteDTO);
-        return Result.success(ResponseEnums.SmallNote_DELETE_LOGIC_SUCCESS);
+        if (smallNoteDeleteDTO.getDeleteType() == 1){
+            return Result.success(ResponseEnums.SmallNote_DELETE_LOGIC_SUCCESS);
+        }else if (smallNoteDeleteDTO.getDeleteType() == 2){
+            return Result.success(ResponseEnums.SmallNote_DELETE_COMPLETE_SUCCESS);
+        }else {
+            return Result.error(ResponseEnums.UNKNOWN_ERROR);
+        }
     }
 
     /**
@@ -83,5 +89,10 @@ public class SmallNoteController {
     public Result<Object> updateSmallNote(@RequestBody SmallNoteUpdateDTO smallNoteUpdateDTO){
         smallNoteService.updateSmallNote(smallNoteUpdateDTO);
         return Result.success(ResponseEnums.SmallNote_UPDATE_STATUS_SUCCESS);
+    }
+
+    @GetMapping("/getSmallNoteForCalendar")
+    public Result<Object> getSmallNoteForCalendar(){
+        return smallNoteService.getSmallNoteForCalendar();
     }
 }

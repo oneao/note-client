@@ -5,7 +5,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/note?characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/note?characterEncoding=utf8&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: root
     type: com.alibaba.druid.pool.DruidDataSource
@@ -34,6 +34,12 @@ spring:
           max-wait: -1    # 最大阻塞等待时间，负值表示没限制，默认-1
           max-idle: 8     # 最大空闲连接，默认8
           min-idle: 0     # 最小空闲连接，默认0
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
 mybatis-plus:
   # MyBatis映射器文件的位置
   mapper-locations: classpath*:mapper/*Mapper.xml
@@ -56,11 +62,23 @@ mail:
 md5encrypt:
   addSalt:
     value: one_ao
+# minio配置
 minio:
   endpoint: http://127.0.0.1:9000
   accessKey: minioadmin
   secretKey: minioadmin
   bucketName: note-bucket
+# 前端分享地址
 front:
   share:
     address: http://localhost:5173/noteShare
+chatgpt:
+  token: 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 #必填
+  proxy-host: 127.0.0.1 #需要代理时必填
+  proxy-port: 7890 #需要代理时必填
+  # model: text-davinci-003 #可选
+  chat-model: gpt-3.5-turbo #可选
+  retries: 3 #可选，默认为5
+  session-expiration-time: 5 #可选，不填则会话永不过期
+#  base-url: https://apps.ichati.cn/1d6f32f8-b59d-46f8-85e9-7d434bxxxxxx/ #可选，默认为https://api.openai.com/，请记住务必以/结尾
+

@@ -5,7 +5,25 @@
 
 <!--绑定接口-->
 <mapper namespace="cn.oneao.noteclient.mapper.SmallNoteMapper">
+    <update id="updateSmallNoteRecoverOne">
+        update small_note set is_delete = 0 where id = #{smallNoteId}
+    </update>
+<!--    完全删除-->
     <delete id="completeDeleteSmallNote" parameterType="Integer">
         delete from small_note where id = #{smallNoteId} and is_delete = 1
     </delete>
+<!--    批量删除-->
+    <delete id="completeDeleteSmallNotes">
+        delete from small_note where id in
+        <foreach collection="smallNoteIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+<!--    批量恢复-->
+    <update id="recoverMany">
+        update small_note set is_delete = 0 where id in
+        <foreach collection="smallNoteIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

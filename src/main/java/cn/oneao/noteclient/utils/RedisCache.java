@@ -14,6 +14,9 @@ import java.util.concurrent.TimeUnit;
 public class RedisCache {
     @Autowired
     public RedisTemplate redisTemplate;
+    public long getKeyExpire(String key,TimeUnit timeUnit){
+        return redisTemplate.getExpire(key,timeUnit);
+    }
     public boolean hasKey(final String key){
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
@@ -38,6 +41,7 @@ public class RedisCache {
     public <T> void setCacheObject(final String key, final T value, final Integer timeout, final TimeUnit timeUnit) {
         redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
     }
+
 
     /**
      * 设置有效时间
@@ -139,7 +143,10 @@ public class RedisCache {
     public <T> Set<T> getCacheSet(final String key) {
         return redisTemplate.opsForSet().members(key);
     }
-
+    //移除set中的指定value
+    public  void deleteCacheSetValue(final String key,final String value){
+        redisTemplate.opsForSet().remove(key,value);
+    }
     /**
      * 缓存Map
      *

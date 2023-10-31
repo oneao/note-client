@@ -45,7 +45,8 @@ public class SendRegisterEmailUtil {
             helper.setText(emailContent, true);
             mailSender.send(message);
             //设置过期时间为3分钟
-            redisCache.setCacheObject(toEmail,code,3,TimeUnit.MINUTES);
+            String redisKey = "USER_REGISTER_" + toEmail;
+            redisCache.setCacheObject(redisKey,code,3,TimeUnit.MINUTES);
             return true;
         } catch (MessagingException e) {
             throw new RuntimeException(e);

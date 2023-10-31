@@ -5,9 +5,12 @@ import cn.oneao.noteclient.pojo.dto.note.NoteShareGetDTO;
 import cn.oneao.noteclient.pojo.dto.note.NoteShareLickDTO;
 import cn.oneao.noteclient.service.NoteShareService;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @RequestMapping("/noteShare")
 @RestController
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class NoteShareController {
     @Autowired
     private NoteShareService noteShareService;
+
     /**
      * 新增分享笔记
      * @param noteShareAddDTO   新增分享笔记的内容
@@ -48,11 +52,16 @@ public class NoteShareController {
      * @return 返回笔记分享的信息
      */
     @PostMapping("/getShareNote")
-    public Result<Object> getShareNote(@RequestBody NoteShareGetDTO noteShareGetDTO){
-        return noteShareService.getShareNote(noteShareGetDTO);
+    public Result<Object> getShareNote(@RequestBody NoteShareGetDTO noteShareGetDTO, HttpServletRequest httpServletRequest){
+        return noteShareService.getShareNote(noteShareGetDTO,httpServletRequest);
     }
+    /**
+     * 点赞
+     * @param noteShareLickDTO 点赞
+     * @return 返回
+     */
     @PutMapping("/goToLick")
-    public Result<Object> goToLick(@RequestBody NoteShareLickDTO noteShareLickDTO){
-        return noteShareService.goToLick(noteShareLickDTO);
+    public Result<Object> goToLick(@RequestBody NoteShareLickDTO noteShareLickDTO, HttpServletRequest httpServletRequest){
+        return noteShareService.goToLick(noteShareLickDTO,httpServletRequest);
     }
 }

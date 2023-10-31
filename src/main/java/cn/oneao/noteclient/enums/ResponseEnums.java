@@ -9,6 +9,7 @@ import lombok.Getter;
 public enum ResponseEnums {
     //统一操作
     PARAMETER_MISSING(40000,"参数缺失"),
+    UNKNOWN_ERROR(40001,"未知错误，请联系管理员!"),
     //用户相关
     USER_TOKEN_ERR(50000,"尚未登录或登录已过期,请重新登录"),
     USER_LOGIN_ERROR(50001,"邮箱号或密码错误或未注册"),
@@ -20,11 +21,19 @@ public enum ResponseEnums {
     USER_REGISTER_GET_CAPTCHA_SUCCESS(60001,"验证码已发送"),
     USER_REGISTER_SUCCESS(60002,"注册成功"),
     USER_SIGN_OUT_SUCCESS(60003,"注销成功"),
+    USER_ACCOUNT_DISABLE(60032,"账号被禁用,请联系管理员"),
+    USER_UPDATE_MESSAGE(60033,"更新个人资料成功"),
+    USER_UPDATE_PASSWORD_ERROR(60034,"该账号原密码错误"),
+    USER_UPDATE_PASSWORD_SUCCESS(60035,"更新密码成功"),
+    USER_FORGET_GET_CAPTCHA_SUCCESS(60036,"获取验证码成功"),
+    USER_FORGET_GET_CAPTCHA_ERROR(60037,"获取验证码失败"),
     //小记操作
     SmallNote_UPDATE_STATUS_SUCCESS(60004,"更新成功"),
     SmallNote_DELETE_LOGIC_SUCCESS(60005,"删除成功,可在回收站内恢复"),
     SmallNote_ADD_SUCCESS(60006,"新增小记成功"),
     SmallNote_UPDATE_SUCCESS(60007,"更新小记成功"),
+    SmallNote_DELETE_COMPLETE_SUCCESS(60038,"彻底删除小记成功,无法恢复!"),
+    SmallNote_RECOVER_SUCCESS(60039,"小记恢复成功,快去小记列表查看吧!"),
     //笔记操作
     NOTE_VERIFY_LOCK_SUCCESS(60008,"笔记密码正确"),
     NOTE_VERIFY_LOCK_ERROR(60009,"笔记密码错误"),
@@ -49,7 +58,11 @@ public enum ResponseEnums {
     NOTE_SHARE_ALLOW_ADD(60028,"允许添加分享笔记"),
     NOTE_SHARE_NOT_ALLOW_ADD(60029,"该笔记已经分享过了哦,请勿重新分享!"),
     NOTE_SHARE_LICK_SUCCESS(60030,"点赞成功"),
-    NOTE_SHARE_LICK_CANCEL_SUCCESS(60031,"取消点赞成功");
+    NOTE_SHARE_LICK_CANCEL_SUCCESS(60031,"取消点赞成功"),
+    NOTE_RECOVER_SUCCESS(60040,"笔记恢复成功,快去笔记列表查看吧"),
+    //批量操作
+    MANY_DELETE_SUCCESS(60041,"批量删除成功"),
+    MANY_RECOVER_SUCCESS(60042,"批量恢复成功");
     private final Integer code;   //响应码
     private final String msg; //相应信息
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--绑定接口-->
+<mapper namespace="cn.oneao.noteclient.mapper.NoteLogMapper">
+    <select id="getNoteActionMessage" resultType="cn.oneao.noteclient.pojo.vo.UserTimeLineVO">
+        select nl.action as title,n.note_title as noteTitle,n.note_body as noteBody,nl.create_time as noteTime
+        from note_log as nl
+        left join note n on n.id = nl.note_id
+        where nl.user_id = #{userId} and nl.note_id is not null and nl.action not in ('USER_UPDATE_NOTE')
+    </select>
+
+    <select id="getSmallNoteActionMessage" resultType="cn.oneao.noteclient.pojo.vo.UserTimeLineVO">
+        select nl.action as title,n.small_note_title as noteTitle,n.small_note_remark as noteBody,nl.create_time as noteTime
+        from note_log as nl
+        left join small_note n on n.id = nl.small_note_id
+        where nl.user_id = #{userId} and nl.small_note_id is not null and nl.action not in ('USER_UPDATE_SMALL_NOTE')
+    </select>
+</mapper>

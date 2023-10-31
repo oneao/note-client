@@ -5,10 +5,29 @@
 
 <!--绑定接口-->
 <mapper namespace="cn.oneao.noteclient.mapper.NoteMapper">
+    <update id="updateNoteRecoveryOne">
+        update note set is_delete = 0 where id = #{noteId}
+    </update>
+<!--    车i的删除-->
     <delete id="completeDeleteNote" parameterType="Integer">
         delete from note where id = #{noteId} and is_delete = 1
     </delete>
+<!--    删除新创建的笔记-->
     <delete id="completeDeleteNewCreateNote" parameterType="Integer">
         delete from note where id = #{noteId} and is_new_build = 0 and is_delete = 0
     </delete>
+<!--    批量删除-->
+    <delete id="completeDeleteNotes" parameterType="Integer">
+        delete from note where id in
+        <foreach collection="noteIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+<!--    批量恢复-->
+    <update id="recoverMany" parameterType="Integer">
+        update note set is_delete = 0 where id in
+        <foreach collection="noteIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

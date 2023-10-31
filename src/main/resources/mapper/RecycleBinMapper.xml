@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--绑定接口-->
+<mapper namespace="cn.oneao.noteclient.mapper.RecycleBinMapper">
+    <select id="selectRecycleBin" resultType="cn.oneao.noteclient.pojo.entity.RecycleBin">
+        SELECT id, title, tags, operationTime, type, typeName FROM (
+            SELECT id, note_title AS `title`, note_tags AS `tags`, update_time AS `operationTime`, 1 AS `type`,"笔记" AS
+            `typeName`
+            FROM note
+            <where>
+                user_id = #{userId} AND note.is_delete = 1
+                <if test="searchValue != null and searchValue != ''">
+                    and note_title like concat('%',#{searchValue},'%')
+                </if>
+            </where>
+            UNION ALL
+            SELECT id, small_note_title AS `title`, small_note_tags AS `tags`, update_time AS `operationTime`, 0 AS
+            `type`,"小记" AS `typeName`
+            FROM small_note
+            <where>
+                user_id = #{userId} AND small_note.is_delete = 1
+                <if test="searchValue != null and searchValue != ''">
+                    and small_note_title like concat('%',#{searchValue},'%')
+                </if>
+            </where>
+        ) AS countResult
+        <where>
+            <if test="classifyValue != null and classifyValue != ''">
+                type = #{classifyValue}
+            </if>
+        </where>
+        ORDER BY `operationTime` DESC
+        LIMIT #{page},#{pageSize}
+    </select>
+    <select id="selectTotal" resultType="java.lang.Integer">
+        SELECT count(*) FROM (
+        SELECT id, note_title AS `title`, note_tags AS `tags`, update_time AS `operationTime`, 1 AS `type`,"笔记" AS
+        `typeName`
+        FROM note
+        <where>
+            user_id = #{userId} AND note.is_delete = 1
+            <if test="searchValue != null and searchValue != ''">
+                and note_title like concat('%',#{searchValue},'%')
+            </if>
+        </where>
+        UNION ALL
+        SELECT id, small_note_title AS `title`, small_note_tags AS `tags`, update_time AS `operationTime`, 0 AS
+        `type`,"小记" AS `typeName`
+        FROM small_note
+        <where>
+            user_id = #{userId} AND small_note.is_delete = 1
+            <if test="searchValue != null and searchValue != ''">
+                and small_note_title like concat('%',#{searchValue},'%')
+            </if>
+        </where>
+        ORDER BY `operationTime` DESC
+        ) AS countResult
+        <where>
+            <if test="classifyValue != null and classifyValue != ''">
+                type = #{classifyValue}
+            </if>
+        </where>
+    </select>
+</mapper>

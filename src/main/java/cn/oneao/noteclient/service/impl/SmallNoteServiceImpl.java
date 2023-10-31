@@ -5,11 +5,14 @@ import cn.oneao.noteclient.mapper.SmallNoteMapper;
 import cn.oneao.noteclient.pojo.dto.smallNote.*;
 import cn.oneao.noteclient.pojo.entity.log.NoteLog;
 import cn.oneao.noteclient.pojo.entity.SmallNote;
+import cn.oneao.noteclient.pojo.vo.SmallNoteCalendarVO;
 import cn.oneao.noteclient.pojo.vo.SmallNoteOneVO;
 import cn.oneao.noteclient.pojo.vo.SmallNoteVO;
 import cn.oneao.noteclient.service.NoteLogService;
 import cn.oneao.noteclient.service.SmallNoteService;
+import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
 import cn.oneao.noteclient.utils.ResponseUtils.PageResult;
+import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -121,7 +125,7 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
         if(deleteType == 1){
             //逻辑删除
             this.removeById(smallNoteId);
-        }else{
+        }else if (deleteType == 2){
             //彻底删除
             smallNoteMapper.completeDeleteSmallNote(smallNoteId);
         }
@@ -188,28 +192,19 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
     @Transactional
     @Override
     public void updateSmallNote(SmallNoteUpdateDTO smallNoteUpdateDTO) {
-        //先删除，后更新
         Integer smallNoteId = smallNoteUpdateDTO.getSmallNoteId();
         if(ObjectUtils.isEmpty(smallNoteId)){
             return;
         }
-        //删除，再添加
-        this.removeById(smallNoteId);
-        //删除日志
-        NoteLog delNoteLog = new NoteLog();
-        delNoteLog.setSmallNoteId(smallNoteId);
-        delNoteLog.setUserId(smallNoteUpdateDTO.getUserId());
-        delNoteLog.setAction(NoteActionEnums.SYSTEM_LOGIN_DELETE_SmallNote.getActionName());
-        delNoteLog.setActionDesc(NoteActionEnums.SYSTEM_LOGIN_DELETE_SmallNote.getActionDesc());
-        noteLogService.save(delNoteLog);
         //创建SmallNote对象
         SmallNote smallNote = new SmallNote();
+        smallNote.setId(smallNoteId);
         BeanUtils.copyProperties(smallNoteUpdateDTO,smallNote);
         if (0 == smallNote.getIsPrompt()){
             smallNote.setBeginTime(null);
             smallNote.setEndTime(null);
         }
-        this.save(smallNote);
+        this.updateById(smallNote);
         /* 添加日志 */
         NoteLog noteLog = new NoteLog();
         noteLog.setSmallNoteId(smallNote.getId());
@@ -217,5 +212,25 @@ public class SmallNoteServiceImpl extends ServiceImpl<SmallNoteMapper, SmallNote
         noteLog.setAction(NoteActionEnums.USER_UPDATE_SmallNote.getActionName());
         noteLog.setActionDesc(NoteActionEnums.USER_UPDATE_SmallNote.getActionDesc());
         noteLogService.save(noteLog);
+    }
+    //获取小记中的待办事件的日期限制
+    @Override
+    public Result<Object> getSmallNoteForCalendar() {
+        int userId = UserContext.getUserId();
+        LambdaQueryWrapper<SmallNote> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SmallNote::getUserId,userId);
+        queryWrapper.eq(SmallNote::getIsPrompt,1);  //通知
+        queryWrapper.eq(SmallNote::getIsFinished,0); //未完成
+        List<SmallNote> list = this.list(queryWrapper);
+        List<SmallNoteCalendarVO> smallNoteCalendarVOList = new ArrayList<>();
+        for (SmallNote smallNote : list) {
+            SmallNoteCalendarVO smallNoteCalendarVO = new SmallNoteCalendarVO();
+            smallNoteCalendarVO.setNoteTitle(smallNote.getSmallNoteTitle());
+            smallNoteCalendarVO.setSmallNoteEvents(smallNote.getSmallNoteEvents());
+            smallNoteCalendarVO.setBeginTime(smallNote.getBeginTime());
+            smallNoteCalendarVO.setEndTime(smallNote.getEndTime());
+            smallNoteCalendarVOList.add(smallNoteCalendarVO);
+        }
+        return Result.success(smallNoteCalendarVOList);
     }
 }
