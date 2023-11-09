@@ -6,7 +6,9 @@ import cn.oneao.noteclient.pojo.dto.comment.CommentAddDTO;
 import cn.oneao.noteclient.pojo.dto.comment.CommentQueryDTO;
 import cn.oneao.noteclient.pojo.entity.comment.Comment;
 import cn.oneao.noteclient.pojo.entity.comment.CommentUser;
+import cn.oneao.noteclient.pojo.entity.rabbitmq.RMCommentReplyMessage;
 import cn.oneao.noteclient.pojo.vo.*;
+import cn.oneao.noteclient.server.DirectSender;
 import cn.oneao.noteclient.service.CommentService;
 import cn.oneao.noteclient.service.CommentUserService;
 import cn.oneao.noteclient.utils.IPUtil;
@@ -40,9 +42,12 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     private String address;
     @Value("${minio.bucketName}")
     private String bucketName;
+    @Value("${front.share.address}")
+    private String shareUrl;
     @Autowired
     private CommentUserService commentUserService;
-
+    @Autowired
+    private DirectSender directSender;//rabbitmq发送
     //新增评论
     @Override
     public Result<Object> addComment(HttpServletRequest httpServletRequest, MultipartFile multipartFile, CommentAddDTO commentAddDTO) {
@@ -58,7 +63,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         comment.setNoteShareId(noteShareId);
         comment.setContent(content);
         //设置顶级评论id为0
-        //TODO:如果不是顶级id，那么需要发送邮箱通知用户评论被回复了。
         if (ObjectUtils.isEmpty(parentId)) {
             parentId = 0;
         }
@@ -73,8 +77,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         //ip地址
         String ipAddr = IPUtil.getIpAddr(httpServletRequest);
         //转化为具体地址
-        //String physicalAddress = PhysicalAddressUtil.getPhysicalAddress(ipAddr);
-        String physicalAddress = "测试地址";
+        String physicalAddress = PhysicalAddressUtil.getPhysicalAddress(ipAddr);
+        //String physicalAddress = "测试地址";
         comment.setAddress(physicalAddress);
         //点赞数
         comment.setLikes(0);
@@ -96,6 +100,16 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         commentUserVO.setAvatar(commentUser.getCommentUserAvatar());      //头像
         commentUserVO.setLevel(commentUser.getCommentUserLevel());       //等级
         commentVO.setCommentUserVO(commentUserVO);
+        if (parentId != 0){
+            String commentUserEmail = commentUser.getCommentUserEmail();//邮箱号
+            Comment parentComment = this.getById(parentId);
+            String parentContent = parentComment.getContent();//内容
+            String url = shareUrl + "?n_sid=" + noteShareId;//链接
+            //noteShareId
+            RMCommentReplyMessage rmCommentReplyMessage = new RMCommentReplyMessage(commentUserEmail,url,parentContent);
+            //发送rabbitmq通知
+            directSender.sendCommentReplyMessage(rmCommentReplyMessage);
+        }
         return Result.success(commentVO);
     }
 

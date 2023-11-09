@@ -18,5 +18,5 @@ public class CommentUser {
     @TableField(fill = FieldFill.INSERT)
     private Integer commentUserLevel;//等级 默认等级为1
     private Integer commentCount;//评论次数
-        private String commentLikes;//评论点赞
+    private String commentLikes;//评论点赞
 }

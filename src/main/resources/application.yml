@@ -19,7 +19,7 @@ spring:
   mail:
     host: smtp.163.com   #邮箱服务器地址
     username: hi_itao@163.com   #邮箱账号
-    password: xxxxxxxxxxxxxx  #邮箱授权码
+    password: xxx  #邮箱授权码
     default-encoding: utf-8    #默认编码
   data:
     redis:
@@ -73,7 +73,7 @@ front:
   share:
     address: http://localhost:5173/noteShare
 chatgpt:
-  token: xxxx #必填
+  token: sk-xxxx #必填
   proxy-host: 127.0.0.1 #需要代理时必填
   proxy-port: 7890 #需要代理时必填
   # model: text-davinci-003 #可选
