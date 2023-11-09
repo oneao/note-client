@@ -140,8 +140,36 @@ public class UserController {
         return userService.getForgetCode(email);
     }
 
+    /**
+     * 更新忘记密码
+     * @param userForgetPasswordDTO 忘记密码DTO
+     * @return 返回
+     */
     @PutMapping("/updateForgetPassword")
     public Result<Object> updateForgetPassword(@RequestBody UserForgetPasswordDTO userForgetPasswordDTO){
         return userService.updateForgetPassword(userForgetPasswordDTO);
+    }
+
+    /**
+     * 获得该用户的点赞信息
+     * @return 返回
+     */
+    @GetMapping("/getLikeMessage")
+    public Result<Object> getLikeMessage(){
+        return userService.getLikeMessage();
+    }
+
+    /**
+     * 删除一个信息
+     * @param value 值
+     * @return 返回
+     */
+    @DeleteMapping("/delOneLikeMessage")
+    public Result<Object> delOneLikeMessage(@RequestBody String value){
+        return userService.delOneLikeMessage(value);
+    }
+    @DeleteMapping("/delAllLikeMessage")
+    public Result<Object> delAllLikeMessage(){
+        return userService.delAllLikeMessage();
     }
 }

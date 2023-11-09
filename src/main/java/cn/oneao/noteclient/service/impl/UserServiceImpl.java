@@ -1,5 +1,6 @@
 package cn.oneao.noteclient.service.impl;
 
+import cn.oneao.noteclient.constant.RedisKeyConstant;
 import cn.oneao.noteclient.enums.NoteActionEnums;
 import cn.oneao.noteclient.enums.ResponseEnums;
 import cn.oneao.noteclient.enums.UserActionEnums;
@@ -35,10 +36,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
@@ -315,5 +313,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userLog.setActionDesc(UserActionEnums.USER_UPDATE_MESSAGE.getActionDesc());
         userLogService.save(userLog);
         return Result.success(ResponseEnums.USER_UPDATE_PASSWORD_SUCCESS);
+    }
+    //获取个人的点赞信息
+    @Override
+    public Result<Object> getLikeMessage() {
+        String redisKey = RedisKeyConstant.SHARE_NOTE_LIKE_MESSAGE_UID + UserContext.getUserId();
+        List<String> result = new ArrayList<>();
+        if (redisCache.hasKey(redisKey)){
+            result = redisCache.getCacheList(redisKey);
+        }
+        return Result.success(result);
+    }
+    //删除一个点赞信息
+    @Override
+    public Result<Object> delOneLikeMessage(String value) {
+        String redisKey = RedisKeyConstant.SHARE_NOTE_LIKE_MESSAGE_UID + UserContext.getUserId();
+        if (redisCache.hasKey(redisKey)) {
+            List<String> cacheList = redisCache.getCacheList(redisKey);
+            if (cacheList.contains(value)) {
+                redisCache.deleteCacheListValue(redisKey, 0, value);
+                return Result.success();
+            } else {
+                return Result.error(ResponseEnums.UNKNOWN_ERROR);
+            }
+        }else {
+            return Result.error(ResponseEnums.UNKNOWN_ERROR);
+        }
+    }
+    //删除所有点赞信息
+    @Override
+    public Result<Object> delAllLikeMessage() {
+        String redisKey = RedisKeyConstant.SHARE_NOTE_LIKE_MESSAGE_UID + UserContext.getUserId();
+        if (redisCache.hasKey(redisKey)){
+            redisCache.deleteObject(redisKey);
+        }
+        return Result.success();
     }
 }

@@ -21,6 +21,7 @@ public class AutoInsertAttribute implements MetaObjectHandler {
         this.setFieldValByName("isCollection",0,metaObject);
         this.setFieldValByName("isTop",0,metaObject);
         this.setFieldValByName("isLock",0,metaObject);
+        this.setFieldValByName("commentUserLevel",1,metaObject);
 
     }
 

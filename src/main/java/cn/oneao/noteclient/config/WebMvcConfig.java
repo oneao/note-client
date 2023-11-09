@@ -26,15 +26,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         LoginInterceptor loginInterceptor = new LoginInterceptor();
         //请求拦截路径
-        String[] addPath = {"/user/login","/user/getCode","/user/register","/user/signOut","/img/**"
-        ,"/noteShare/getShareNoteIsLock","/noteShare/getShareNote","/noteShare/goToLick","/openai/**","/note/error",
-        "/note/webSocket"};
+        String[] addPath = {"/user/login", "/user/getCode", "/user/register", "/user/signOut", "/img/**", "/user/getLikeMessage"
+                , "/noteShare/getShareNoteIsLock", "/noteShare/getShareNote", "/noteShare/goToLick", "/openai/**", "/note/error",
+                "/note/webSocket", "/image/uploadCommentUserImage", "/comment/**", "/commentUser/**"};
         registry.addInterceptor(loginInterceptor)
                 //这里配置要拦截的路径
                 .addPathPatterns("/**")
                 //放行路径，其他都进行拦截
                 .excludePathPatterns(addPath);
     }
+
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();

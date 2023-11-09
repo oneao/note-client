@@ -117,7 +117,22 @@ public class RedisCache {
     public <T> List<T> getCacheList(final String key) {
         return redisTemplate.opsForList().range(key, 0, -1);
     }
+    //向list中添加值
+    public void addCacheListValue(final String key,final String value){
+        redisTemplate.opsForList().rightPush(key,value);
+    }
 
+    /**
+     * 删除list中的值
+     * @param key 键
+     * @param countEvents 事件 -1代表从存储容器的最右边开始，删除一个与要移除的值匹配的数据；
+     *                          0代表删除所有与传入值匹配的数据；
+     *                          1代表从存储容器的最左边开始，删除一个与要移除的值匹配的数据。
+     * @param value 值
+     */
+    public void deleteCacheListValue(final String key,final Integer countEvents,final String value){
+        redisTemplate.opsForList().remove(key,countEvents,value);
+    }
     /**
      * 缓存Set
      *
@@ -146,6 +161,10 @@ public class RedisCache {
     //移除set中的指定value
     public  void deleteCacheSetValue(final String key,final String value){
         redisTemplate.opsForSet().remove(key,value);
+    }
+    //向set中添加值
+    public void setCacheSetValue(final String key,final String value){
+        redisTemplate.opsForSet().add(key,value);
     }
     /**
      * 缓存Map

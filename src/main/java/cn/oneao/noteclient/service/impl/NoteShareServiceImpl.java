@@ -23,6 +23,7 @@ import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +31,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -167,10 +168,10 @@ public class NoteShareServiceImpl extends ServiceImpl<NoteShareMapper, NoteShare
         User user = userService.getById(note.getUserId());
         noteShareVO.setNickName(user.getNickName());
         //检查该用户是否进行了点赞
-        String redisKey = RedisKeyConstant.SHARE_NOTE_LIKE_IP + noteShare.getId();
+        String redisKey = RedisKeyConstant.SHARE_NOTE_LIKE_IP_NSID + noteShare.getId();
         if (redisCache.hasKey(redisKey)) {
             Set<Object> cacheSet = redisCache.getCacheSet(redisKey);
-            String clientIP = IPUtil.getClientIP(httpServletRequest);
+            String clientIP = IPUtil.getIpAddr(httpServletRequest);
             if (cacheSet.contains(clientIP)) {
                 noteShareVO.setIsLike(1);//点赞
             } else {
@@ -229,23 +230,25 @@ public class NoteShareServiceImpl extends ServiceImpl<NoteShareMapper, NoteShare
 
         NoteShare noteShare = this.getById(id);
         Integer noteLikeNumber = noteShare.getNoteLikeNumber();
-        String redisKey = RedisKeyConstant.SHARE_NOTE_LIKE_IP + id;
-        String lickIp = IPUtil.getClientIP(httpServletRequest); //用户的ip地址
+        String redisKey = RedisKeyConstant.SHARE_NOTE_LIKE_IP_NSID + id;
+        String lickIp = IPUtil.getIpAddr(httpServletRequest); //用户的ip地址
         if (redisCache.hasKey(redisKey)) {
             Set<String> likeIpSet = redisCache.getCacheSet(redisKey);
             boolean flag = likeIpSet.add(lickIp);
             if (!flag) {
                 //取消点赞:就需要移除IP
-                redisCache.deleteCacheSetValue(redisKey, lickIp);    //移除ip
+                redisCache.deleteCacheSetValue(redisKey, lickIp);//移除ip
+            } else {
+                redisCache.setCacheSetValue(redisKey, lickIp);
             }
         } else {
             Set<String> set = new HashSet<>();
             set.add(lickIp);
             redisCache.setCacheSet(redisKey, set);
         }
-        if (likeHeart == 1){
+        if (likeHeart == 1) {
             noteLikeNumber = noteLikeNumber + 1;
-        }else {
+        } else {
             noteLikeNumber = noteLikeNumber - 1;
         }
         LambdaUpdateWrapper<NoteShare> updateWrapper = new LambdaUpdateWrapper<>();
@@ -256,12 +259,45 @@ public class NoteShareServiceImpl extends ServiceImpl<NoteShareMapper, NoteShare
         Integer noteId = noteShare.getNoteId();
         Note note = noteService.getById(noteId);
         Integer userId = note.getUserId();
-
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = sdf.format(date);
         if (likeHeart == 1) {
-            String likeMsg = userId + "^" + new Date() + "^" + "你的文章《" + noteShare.getNoteShareTitle() + "》收获到了一个赞哦！";
+            //前端及时响应
+            String likeMsg = "";
+            //存储到redis中
+            String likeMessage = formattedDate + "^" + "你的文章《" + noteShare.getNoteShareTitle() + "》收获到了一个赞哦😋";
+            String redisKeyMessage = RedisKeyConstant.SHARE_NOTE_LIKE_MESSAGE_UID + userId;
+            if (redisCache.hasKey(redisKeyMessage)) {
+                List<String> cacheList = redisCache.getCacheList(redisKeyMessage);
+                int size = cacheList.size();
+                redisCache.addCacheListValue(redisKeyMessage, size + "^" + likeMessage);
+                likeMsg = userId + "^" + size + "^" + formattedDate + "^" + "你的文章《" + noteShare.getNoteShareTitle() + "》收获到了一个赞哦😋";
+            } else {
+                List<String> list = new ArrayList<>();
+                list.add(0 + "^" + likeMessage);
+                redisCache.setCacheList(redisKeyMessage, list);
+                likeMsg = userId + "^" + 0 + "^" + formattedDate + "^" + "你的文章《" + noteShare.getNoteShareTitle() + "》收获到了一个赞哦😋";
+            }
             directSender.sendDirect(likeMsg);
             return Result.success(ResponseEnums.NOTE_SHARE_LICK_SUCCESS);
         } else {
+            //前端及时响应
+            String likeMessage = formattedDate + "^" + "你的文章《" + noteShare.getNoteShareTitle() + "》减少了一个赞😭";
+            String redisKeyMessage = RedisKeyConstant.SHARE_NOTE_LIKE_MESSAGE_UID + userId;
+            String likeMsg = "";
+            if (redisCache.hasKey(redisKeyMessage)) {
+                List<Object> cacheList = redisCache.getCacheList(redisKeyMessage);
+                int size = cacheList.size();
+                redisCache.addCacheListValue(redisKeyMessage,size + "^" + likeMessage);
+                likeMsg = userId + "^" + size + "^" + formattedDate + "^" + "你的文章《" + noteShare.getNoteShareTitle() + "》减少了一个赞😭";
+            } else {
+                List<String> list = new ArrayList<>();
+                list.add(0+"^"+likeMessage);
+                redisCache.setCacheList(redisKeyMessage, list);
+                likeMsg =  userId + "^" + 0 + "^" + formattedDate + "^" + "你的文章《" + noteShare.getNoteShareTitle() + "》减少了一个赞😭";
+            }
+            directSender.sendDirect(likeMsg);
             return Result.success(ResponseEnums.NOTE_SHARE_LICK_CANCEL_SUCCESS);
         }
     }

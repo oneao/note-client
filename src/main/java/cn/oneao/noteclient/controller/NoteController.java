@@ -17,8 +17,6 @@ import java.util.List;
 public class NoteController {
     @Autowired
     private NoteService noteService;
-
-
     /**
      * 获取当前登录用户的笔记信息
      * @return 返回笔记列表
@@ -54,7 +52,6 @@ public class NoteController {
     public Result<Object> completelyLiftedNoteLockPassword(@RequestBody NoteLockPassWordDTO noteLockPassWordDTO){
         return noteService.completelyLiftedNoteLockPassword(noteLockPassWordDTO);
     }
-
     /**
      * 修改笔记的置顶状态
      * @param noteTopStatusDTO 笔记置顶对象

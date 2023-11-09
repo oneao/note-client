@@ -45,6 +45,18 @@ public class ImageController {
         imageResult.setData(image);
         return imageResult;
     }
+
+    @PostMapping("/uploadCommentUserImage")
+    public ImageResult uploadCommentUserImage(@RequestParam("file") MultipartFile multipartFile){
+        String fileName = MinioUtil.upload(multipartFile);
+        String url = address + "/" + bucketName + "/" + fileName;
+        Image image = new Image();
+        image.setUrl(url);
+        ImageResult imageResult = new ImageResult();
+        imageResult.setErrno(0);
+        imageResult.setData(image);
+        return imageResult;
+    }
     @PostMapping("/")
     //@PostMapping("/upload")
     public ImageResult uploadImage(@RequestParam("file") MultipartFile multipartFile, HttpServletRequest httpServletRequest){

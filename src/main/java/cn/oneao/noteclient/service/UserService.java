@@ -27,4 +27,10 @@ public interface UserService extends IService<User> {
     Result<Object> getForgetCode(String email);
     //根据忘记密码验证码更新
     Result<Object> updateForgetPassword(UserForgetPasswordDTO userForgetPasswordDTO);
+    //获取个人的点赞信息
+    Result<Object> getLikeMessage();
+    //删除一个点赞信息
+    Result<Object> delOneLikeMessage(String value);
+    //删除所有点赞信息
+    Result<Object> delAllLikeMessage();
 }
