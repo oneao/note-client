@@ -12,6 +12,7 @@ import cn.oneao.noteclient.pojo.dto.user.UserResetPasswordDTO;
 import cn.oneao.noteclient.pojo.dto.user.UserUpdateDTO;
 import cn.oneao.noteclient.pojo.entity.User;
 import cn.oneao.noteclient.pojo.entity.log.UserLog;
+import cn.oneao.noteclient.pojo.entity.rabbitmq.RMCommentReplyNotice;
 import cn.oneao.noteclient.pojo.vo.UserInfoVO;
 import cn.oneao.noteclient.pojo.vo.UserLoginVO;
 import cn.oneao.noteclient.pojo.vo.UserTimeLineVO;
@@ -27,6 +28,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Autowired
     private UserMapper userMapper;
@@ -342,10 +345,38 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
     //删除所有点赞信息
     @Override
-    public Result<Object> delAllLikeMessage() {
-        String redisKey = RedisKeyConstant.SHARE_NOTE_LIKE_MESSAGE_UID + UserContext.getUserId();
+    public Result<Object> delAllReplyMessage() {
+        String redisLikeKey = RedisKeyConstant.SHARE_NOTE_LIKE_MESSAGE_UID + UserContext.getUserId();
+        if (redisCache.hasKey(redisLikeKey)){
+            redisCache.deleteObject(redisLikeKey);
+        }
+        String redisCommentKey = RedisKeyConstant.SHARE_NOTE_COMMENT_UID + UserContext.getUserId();
+        if(redisCache.hasKey(redisCommentKey)){
+            redisCache.deleteObject(redisCommentKey);
+        }
+        return Result.success();
+    }
+    //获取所有评论信息
+    @Override
+    public Result<Object> getCommentReply() {
+        String redisKey = RedisKeyConstant.SHARE_NOTE_COMMENT_UID + UserContext.getUserId();
+        List<String> result = new ArrayList<>();
         if (redisCache.hasKey(redisKey)){
-            redisCache.deleteObject(redisKey);
+            result = redisCache.getCacheList(redisKey);
+        }
+        return Result.success(result);
+    }
+    //删除一个点赞信息
+    @Override
+    public Result<Object> delOneCommentReply(Integer index) {
+        if(ObjectUtils.isEmpty(index)){
+            return Result.error(ResponseEnums.PARAMETER_MISSING);
+        }
+        String redisKey = RedisKeyConstant.SHARE_NOTE_COMMENT_UID + UserContext.getUserId();
+        if(redisCache.hasKey(redisKey)) {
+            List<RMCommentReplyNotice> cacheList = redisCache.getCacheList(redisKey);
+            RMCommentReplyNotice rmCommentReplyNotice = cacheList.get(index);
+            redisCache.deleteCacheListValue(redisKey,1,rmCommentReplyNotice);
         }
         return Result.success();
     }

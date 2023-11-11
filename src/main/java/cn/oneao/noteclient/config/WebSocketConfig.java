@@ -11,7 +11,11 @@ public class WebSocketConfig {
 
     @Bean
     public ServerEndpointExporter serverEndpointExporter(){
-        return new ServerEndpointExporter();
+        // 创建 ServerEndpointExporter 实例
+        ServerEndpointExporter exporter = new ServerEndpointExporter();
+
+        // 返回 ServerEndpointExporter 实例
+        return exporter;
     }
 
 }

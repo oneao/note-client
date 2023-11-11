@@ -91,7 +91,6 @@ public class UserController {
         UserContext.removeUserId();
         return Result.error("传入数据为空");
     }
-
     /**
      * 获取用户的信息
      * @return 返回用户的信息
@@ -100,7 +99,6 @@ public class UserController {
     public Result<Object> getUserInfo(){
         return userService.getUserInfo();
     }
-
     /**
      * 更新用户信息
      * @param userUpdateDTO 头像 昵称
@@ -110,7 +108,6 @@ public class UserController {
     public Result<Object> updateUserMessage(@RequestBody UserUpdateDTO userUpdateDTO){
         return userService.updateUserMessage(userUpdateDTO);
     }
-
     /**
      * 获取用户的操作日志（时间线）
      * @return 返回日志信息
@@ -119,7 +116,6 @@ public class UserController {
     public Result<Object> getUserTimeLine(){
         return userService.getUserTimeLine();
     }
-
     /**
      * 重置密码
      * @param userResetPasswordDTO 原密码，新密码
@@ -129,7 +125,6 @@ public class UserController {
     public Result<Object> toResetPassword(@RequestBody UserResetPasswordDTO userResetPasswordDTO){
         return userService.toResetPassword(userResetPasswordDTO);
     }
-
     /**
      * 获取验证码
      * @param email 根据邮箱号获取验证码
@@ -139,7 +134,6 @@ public class UserController {
     public Result<Object> getForgetCode(@RequestParam("email") String email){
         return userService.getForgetCode(email);
     }
-
     /**
      * 更新忘记密码
      * @param userForgetPasswordDTO 忘记密码DTO
@@ -149,7 +143,6 @@ public class UserController {
     public Result<Object> updateForgetPassword(@RequestBody UserForgetPasswordDTO userForgetPasswordDTO){
         return userService.updateForgetPassword(userForgetPasswordDTO);
     }
-
     /**
      * 获得该用户的点赞信息
      * @return 返回
@@ -160,7 +153,7 @@ public class UserController {
     }
 
     /**
-     * 删除一个信息
+     * 删除一个点赞信息
      * @param value 值
      * @return 返回
      */
@@ -168,8 +161,29 @@ public class UserController {
     public Result<Object> delOneLikeMessage(@RequestBody String value){
         return userService.delOneLikeMessage(value);
     }
-    @DeleteMapping("/delAllLikeMessage")
-    public Result<Object> delAllLikeMessage(){
-        return userService.delAllLikeMessage();
+    /**
+     * 删除所有点赞和评论信息
+     * @return 返回
+     */
+    @DeleteMapping("/delAllReplyMessage")
+    public Result<Object> delAllReplyMessage(){
+        return userService.delAllReplyMessage();
+    }
+    /**
+     * 获取评论信息
+     * @return 评论列表
+     */
+    @GetMapping("/getCommentReply")
+    public Result<Object> getCommentReply(){
+        return userService.getCommentReply();
+    }
+    /**
+     * 删除一个评论信息
+     * @param index 集合的索引
+     * @return 没有
+     */
+    @DeleteMapping("/delOneCommentReply")
+    public Result<Object> delOneCommentReply(@RequestParam("index")Integer index){
+        return userService.delOneCommentReply(index);
     }
 }

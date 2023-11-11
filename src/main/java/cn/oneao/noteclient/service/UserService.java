@@ -32,5 +32,9 @@ public interface UserService extends IService<User> {
     //删除一个点赞信息
     Result<Object> delOneLikeMessage(String value);
     //删除所有点赞信息
-    Result<Object> delAllLikeMessage();
+    Result<Object> delAllReplyMessage();
+    //获取评论信息
+    Result<Object> getCommentReply();
+    //删除一个评论信息
+    Result<Object> delOneCommentReply(Integer index);
 }

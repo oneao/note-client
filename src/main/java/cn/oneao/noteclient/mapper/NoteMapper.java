@@ -18,4 +18,5 @@ public interface NoteMapper extends BaseMapper<Note> {
     void completeDeleteNotes(@Param("noteIds") List<Integer> noteIds);
 
     void recoverMany(@Param("noteIds") List<Integer> noteIds);
+
 }

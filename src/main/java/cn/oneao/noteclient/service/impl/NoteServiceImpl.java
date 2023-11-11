@@ -8,6 +8,7 @@ import cn.oneao.noteclient.pojo.dto.note.*;
 import cn.oneao.noteclient.pojo.entity.note.Note;
 import cn.oneao.noteclient.pojo.entity.log.NoteLog;
 import cn.oneao.noteclient.pojo.entity.note.NoteShare;
+import cn.oneao.noteclient.pojo.vo.NoteCollectionVO;
 import cn.oneao.noteclient.pojo.vo.NoteVO;
 import cn.oneao.noteclient.service.NoteLogService;
 import cn.oneao.noteclient.service.NoteService;
@@ -304,5 +305,26 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         noteLog.setActionDesc(NoteActionEnums.USER_UPDATE_NOTE.getActionDesc());
         noteLogService.save(noteLog);
         return Result.success(ResponseEnums.NOTE_UPDATE_SUCCESS);
+    }
+    //获取收藏的笔记
+    @Override
+    public Result<Object> getCollectionNote() {
+        int userId = UserContext.getUserId();
+        LambdaQueryWrapper<Note> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Note::getUserId,userId);
+        queryWrapper.eq(Note::getIsCollection,1);
+        List<Note> list = this.list(queryWrapper);
+        List<NoteCollectionVO> noteCollectionVOList = new ArrayList<>();
+        int serialNumber = 1;
+        for (Note note : list) {
+            NoteCollectionVO noteCollectionVO = new NoteCollectionVO();
+            noteCollectionVO.setId(note.getId());
+            noteCollectionVO.setTitle(note.getNoteTitle());
+            noteCollectionVO.setTags(note.getNoteTags());
+            noteCollectionVO.setContent(note.getNoteContent());
+            noteCollectionVO.setSerialNumber(serialNumber++);
+            noteCollectionVOList.add(noteCollectionVO);
+        }
+        return Result.success(noteCollectionVOList);
     }
 }

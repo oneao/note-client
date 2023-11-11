@@ -1,12 +1,18 @@
 package cn.oneao.noteclient.service.impl;
 
+import cn.oneao.noteclient.constant.RedisKeyConstant;
 import cn.oneao.noteclient.enums.ResponseEnums;
 import cn.oneao.noteclient.mapper.CommentMapper;
+import cn.oneao.noteclient.mapper.NoteMapper;
+import cn.oneao.noteclient.mapper.NoteShareMapper;
 import cn.oneao.noteclient.pojo.dto.comment.CommentAddDTO;
 import cn.oneao.noteclient.pojo.dto.comment.CommentQueryDTO;
 import cn.oneao.noteclient.pojo.entity.comment.Comment;
 import cn.oneao.noteclient.pojo.entity.comment.CommentUser;
+import cn.oneao.noteclient.pojo.entity.note.Note;
+import cn.oneao.noteclient.pojo.entity.note.NoteShare;
 import cn.oneao.noteclient.pojo.entity.rabbitmq.RMCommentReplyMessage;
+import cn.oneao.noteclient.pojo.entity.rabbitmq.RMCommentReplyNotice;
 import cn.oneao.noteclient.pojo.vo.*;
 import cn.oneao.noteclient.server.DirectSender;
 import cn.oneao.noteclient.service.CommentService;
@@ -14,6 +20,7 @@ import cn.oneao.noteclient.service.CommentUserService;
 import cn.oneao.noteclient.utils.IPUtil;
 import cn.oneao.noteclient.utils.MinioUtil;
 import cn.oneao.noteclient.utils.PhysicalAddressUtil;
+import cn.oneao.noteclient.utils.RedisCache;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -48,6 +55,12 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     private CommentUserService commentUserService;
     @Autowired
     private DirectSender directSender;//rabbitmq发送
+    @Autowired
+    private NoteShareMapper noteShareMapper;
+    @Autowired
+    private NoteMapper noteMapper;
+    @Autowired
+    private RedisCache redisCache;
     //新增评论
     @Override
     public Result<Object> addComment(HttpServletRequest httpServletRequest, MultipartFile multipartFile, CommentAddDTO commentAddDTO) {
@@ -77,8 +90,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         //ip地址
         String ipAddr = IPUtil.getIpAddr(httpServletRequest);
         //转化为具体地址
-        String physicalAddress = PhysicalAddressUtil.getPhysicalAddress(ipAddr);
-        //String physicalAddress = "测试地址";
+        //String physicalAddress = PhysicalAddressUtil.getPhysicalAddress(ipAddr);
+        String physicalAddress = "测试地址";
         comment.setAddress(physicalAddress);
         //点赞数
         comment.setLikes(0);
@@ -109,10 +122,30 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             RMCommentReplyMessage rmCommentReplyMessage = new RMCommentReplyMessage(commentUserEmail,url,parentContent);
             //发送rabbitmq通知
             directSender.sendCommentReplyMessage(rmCommentReplyMessage);
+        }else {
+            NoteShare noteShare = noteShareMapper.selectById(noteShareId);
+            Note note = noteMapper.selectById(noteShare.getNoteId());
+            RMCommentReplyNotice rmCommentReplyNotice = new RMCommentReplyNotice();
+            rmCommentReplyNotice.setUserId(note.getUserId());
+            rmCommentReplyNotice.setTime(comment.getCreateTime());
+            rmCommentReplyNotice.setMessage(noteShare.getNoteShareTitle());
+            //存储到redis中
+            String redisKey = RedisKeyConstant.SHARE_NOTE_COMMENT_UID + note.getUserId();
+            if(!redisCache.hasKey(redisKey)){
+                List<RMCommentReplyNotice> list = new ArrayList<>();
+                rmCommentReplyNotice.setIndex(0);
+                list.add(rmCommentReplyNotice);
+                redisCache.setCacheList(redisKey,list);
+            }else{
+                List<RMCommentReplyNotice> cacheList = redisCache.getCacheList(redisKey);
+                int size = cacheList.size();
+                rmCommentReplyNotice.setIndex(size);
+                redisCache.addCacheListObjectValue(redisKey,rmCommentReplyNotice);
+            }
+            directSender.sendCommentReplyNotice(rmCommentReplyNotice);
         }
         return Result.success(commentVO);
     }
-
     //获取评论列表
     @Override
     public Result<Object> getComments(CommentQueryDTO commentQueryDTO) {
@@ -154,7 +187,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         commentsPageVO.setResult(pagedComments);
         return Result.success(commentsPageVO);
     }
-
     private CommentsVO buildCommentTree(Comment comment, List<Comment> commentList) {
         CommentsVO commentsVO = new CommentsVO();
         commentsVO.setId(comment.getId());
@@ -184,7 +216,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
         return commentsVO;
     }
-
     private List<Comment> getTopLevelComments(List<Comment> commentList) {
         List<Comment> topLevelComments = new ArrayList<>();
         for (Comment comment : commentList) {
@@ -194,7 +225,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         }
         return topLevelComments;
     }
-
     //点赞
     @Override
     @Transactional

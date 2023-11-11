@@ -124,4 +124,8 @@ public class NoteController {
     public Result<Object> updateNoteMessage(@RequestBody NoteUpdateMessageDTO noteUpdateMessageDTO){
         return noteService.updateNoteMessage(noteUpdateMessageDTO);
     }
+    @GetMapping("/获取收藏的笔记")
+    public Result<Object> getCollectionNote(){
+        return noteService.getCollectionNote();
+    }
 }

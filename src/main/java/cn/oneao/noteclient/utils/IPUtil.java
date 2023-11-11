@@ -38,8 +38,8 @@ public class IPUtil {
             ip = request.getRemoteAddr();
         }
         if (ip.equals(LOCAL_IP) || ip.equals("0:0:0:0:0:0:0:1")){
-            return HttpClientUtil.doGet("http://ip.42.pl/raw",false);
-            //return LOCAL_IP;
+            //return HttpClientUtil.doGet("http://ip.42.pl/raw",false);
+            return LOCAL_IP;
         }
         return ip;
     }
