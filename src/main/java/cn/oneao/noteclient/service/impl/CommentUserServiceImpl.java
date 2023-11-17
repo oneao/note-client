@@ -45,6 +45,9 @@ public class CommentUserServiceImpl extends ServiceImpl<CommentUserMapper,Commen
             return Result.error(ResponseEnums.PARAMETER_MISSING);
         }
         CommentUser commentUser = this.getById(id);
+        if(ObjectUtils.isEmpty(commentUser)){
+            return Result.error(ResponseEnums.PARAMETER_MISSING);
+        }
         String commentLikes = commentUser.getCommentLikes();
         return Result.success(commentLikes);
     }

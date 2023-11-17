@@ -12,7 +12,8 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 public class RMCommentReplyNotice implements Serializable {
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 1L;
+    private String mark;
     private Integer userId;
     private Integer index;//序号
     private Date time;//评论时间

@@ -124,8 +124,33 @@ public class NoteController {
     public Result<Object> updateNoteMessage(@RequestBody NoteUpdateMessageDTO noteUpdateMessageDTO){
         return noteService.updateNoteMessage(noteUpdateMessageDTO);
     }
-    @GetMapping("/获取收藏的笔记")
-    public Result<Object> getCollectionNote(){
-        return noteService.getCollectionNote();
+    /**
+     * 获取收藏笔记
+     * @return  收藏笔记列表
+     */
+    @PostMapping("/getCollectionNote")
+    public Result<Object> getCollectionNote(@RequestBody NoteCollectionSearchDTO noteCollectionSearchDTO){
+        return noteService.getCollectionNote(noteCollectionSearchDTO);
     }
+    /**
+     * 取消收藏一个笔记
+     * @param noteId 笔记id
+     * @return 返回
+     */
+    @PatchMapping("/cancelCollectionNote/{noteId}")
+    public Result<Object> cancelCollectionNote(@PathVariable Integer noteId){
+        return noteService.cancelCollectionNote(noteId);
+    }
+
+    /**
+     * 批量取消收藏笔记
+     * @param noteIds 笔记列表id
+     * @return 返回成功信息
+     */
+    @PatchMapping("/batchCancelCollectionNotes")
+    public Result<Object> batchCancelCollectionNotes(@RequestBody List<Integer> noteIds){
+        return noteService.batchCancelCollectionNotes(noteIds);
+    }
+
+
 }

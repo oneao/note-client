@@ -8,7 +8,7 @@
     <update id="updateNoteRecoveryOne">
         update note set is_delete = 0 where id = #{noteId}
     </update>
-<!--    车i的删除-->
+<!--    彻底删除-->
     <delete id="completeDeleteNote" parameterType="Integer">
         delete from note where id = #{noteId} and is_delete = 1
     </delete>

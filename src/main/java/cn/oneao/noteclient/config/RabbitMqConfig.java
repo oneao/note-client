@@ -24,6 +24,8 @@ public class RabbitMqConfig {
     public static final String COMMENT_REPLY_NOTICE_QUEUE = "comment_reply_notice_queue";
     public static final String COMMENT_REPLY_NOTICE_KEY = "comment.reply.notice.key";
 
+    public static final String USER_LEVEL_UP_QUEUE = "user_level_up_queue";
+    public static final String USER_LEVEL_UP_KEY = "user.level.up.key";
     @Bean
     public Queue directQueue1() {
         return new Queue(DIRECT_QUEUE);
@@ -36,7 +38,10 @@ public class RabbitMqConfig {
     public Queue directQueue3() {
         return new Queue(COMMENT_REPLY_NOTICE_QUEUE);
     }
-
+    @Bean
+    public Queue directQueue4() {
+        return new Queue(USER_LEVEL_UP_QUEUE);
+    }
     @Bean
     public DirectExchange directExchange() {
         return new DirectExchange(DIRECT_EXCHANGE);
@@ -52,6 +57,10 @@ public class RabbitMqConfig {
     @Bean
     public Binding binding3() {
         return BindingBuilder.bind(directQueue3()).to(directExchange()).with(COMMENT_REPLY_NOTICE_KEY);
+    }
+    @Bean
+    public Binding binding4() {
+        return BindingBuilder.bind(directQueue4()).to(directExchange()).with(USER_LEVEL_UP_KEY);
     }
     @Bean
     public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {

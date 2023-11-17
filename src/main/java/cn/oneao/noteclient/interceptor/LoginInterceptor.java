@@ -1,6 +1,7 @@
 package cn.oneao.noteclient.interceptor;
 
 import cn.oneao.noteclient.enums.ResponseEnums;
+import cn.oneao.noteclient.service.UserService;
 import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
 import cn.oneao.noteclient.utils.JwtHelper;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
@@ -9,6 +10,7 @@ import com.auth0.jwt.interfaces.Claim;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -37,7 +39,6 @@ public class LoginInterceptor implements HandlerInterceptor {
         try {
             String userId = request.getHeader("id");
             String token = request.getHeader("Authorization");
-            log.info("token:{}",token);
             if(!ObjectUtils.isEmpty(token) && token.length() > 11){
                 token = token.substring(7);
                 //如果验证通过,即为通过。

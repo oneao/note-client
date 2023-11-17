@@ -13,6 +13,7 @@ public class NoteCollectionVO {
     private Integer serialNumber;//序号 1,2,3,4,5
     private String title;//标题
     private String tags;//标签
+    private String noteBody;//主体
     private String content;//内容
     private Date operationTime;//操作时间
 }

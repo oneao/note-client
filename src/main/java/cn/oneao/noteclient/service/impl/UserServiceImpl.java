@@ -11,12 +11,14 @@ import cn.oneao.noteclient.pojo.dto.user.UserRegisterDTO;
 import cn.oneao.noteclient.pojo.dto.user.UserResetPasswordDTO;
 import cn.oneao.noteclient.pojo.dto.user.UserUpdateDTO;
 import cn.oneao.noteclient.pojo.entity.User;
+import cn.oneao.noteclient.pojo.entity.UserLevel;
 import cn.oneao.noteclient.pojo.entity.log.UserLog;
 import cn.oneao.noteclient.pojo.entity.rabbitmq.RMCommentReplyNotice;
 import cn.oneao.noteclient.pojo.vo.UserInfoVO;
 import cn.oneao.noteclient.pojo.vo.UserLoginVO;
 import cn.oneao.noteclient.pojo.vo.UserTimeLineVO;
 import cn.oneao.noteclient.service.NoteLogService;
+import cn.oneao.noteclient.service.UserLevelService;
 import cn.oneao.noteclient.service.UserLogService;
 import cn.oneao.noteclient.service.UserService;
 import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
@@ -55,6 +57,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private String md5encryptAddSaltValue;
     @Autowired
     private SendForgetCodeEmailUtil sendForgetCodeEmailUtil;
+    @Autowired
+    private UserLevelService userLevelService;
     @Override
     @Transactional
     public Result<Object> userRegister(UserRegisterDTO userRegisterDTO) {
@@ -77,11 +81,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setAvatar("http://127.0.0.1:9000/note-bucket/adf77c91-1fe2-4610-971c-c033b9b62242.jpg");
         //采用md5加密
         user.setPassword(DigestUtils.md5DigestAsHex((md5encryptAddSaltValue+userRegisterDTO.getPassword()).getBytes(StandardCharsets.UTF_8)));
-        //TODO:头像位置待添加
         //新增返回的用户id
         userMapper.insert(user);
+        //删除redis中注册验证码
         redisCache.deleteObject(redisKey);
         Integer userId = user.getId();
+        //插入UserLevel表
+        UserLevel userLevel = new UserLevel();
+        userLevel.setUserId(userId);
+        userLevel.setLevel(1);
+        userLevel.setCollectionNoteNumber(0);
+        userLevel.setShareNoteNumber(0);
+        userLevel.setShareNoteVisitNumber(0);
+        userLevel.setShareNoteLikeNumber(0);
+        userLevel.setShareNoteCommentNumber(0);
+        userLevelService.save(userLevel);
         //添加操作日志
         UserLog userLog = new UserLog();
         userLog.setUserId(userId);
@@ -327,7 +341,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return Result.success(result);
     }
-    //删除一个点赞信息
+    //删除一个通知栏点赞信息
     @Override
     public Result<Object> delOneLikeMessage(String value) {
         String redisKey = RedisKeyConstant.SHARE_NOTE_LIKE_MESSAGE_UID + UserContext.getUserId();
@@ -343,7 +357,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return Result.error(ResponseEnums.UNKNOWN_ERROR);
         }
     }
-    //删除所有点赞信息
+    //删除所有通知栏点赞信息
     @Override
     public Result<Object> delAllReplyMessage() {
         String redisLikeKey = RedisKeyConstant.SHARE_NOTE_LIKE_MESSAGE_UID + UserContext.getUserId();
@@ -356,7 +370,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return Result.success();
     }
-    //获取所有评论信息
+    //获取所有通知栏评论信息
     @Override
     public Result<Object> getCommentReply() {
         String redisKey = RedisKeyConstant.SHARE_NOTE_COMMENT_UID + UserContext.getUserId();
@@ -366,7 +380,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return Result.success(result);
     }
-    //删除一个点赞信息
+    //删除一个通知栏点赞信息
     @Override
     public Result<Object> delOneCommentReply(Integer index) {
         if(ObjectUtils.isEmpty(index)){

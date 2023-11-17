@@ -1,12 +1,15 @@
 package cn.oneao.noteclient.service.impl;
 
+import cn.oneao.noteclient.annotations.ObserveUserLevel;
 import cn.oneao.noteclient.constant.RedisKeyConstant;
 import cn.oneao.noteclient.enums.ResponseEnums;
+import cn.oneao.noteclient.enums.WebSocketMarkEnums;
 import cn.oneao.noteclient.mapper.CommentMapper;
 import cn.oneao.noteclient.mapper.NoteMapper;
 import cn.oneao.noteclient.mapper.NoteShareMapper;
 import cn.oneao.noteclient.pojo.dto.comment.CommentAddDTO;
 import cn.oneao.noteclient.pojo.dto.comment.CommentQueryDTO;
+import cn.oneao.noteclient.pojo.entity.UserLevel;
 import cn.oneao.noteclient.pojo.entity.comment.Comment;
 import cn.oneao.noteclient.pojo.entity.comment.CommentUser;
 import cn.oneao.noteclient.pojo.entity.note.Note;
@@ -17,6 +20,7 @@ import cn.oneao.noteclient.pojo.vo.*;
 import cn.oneao.noteclient.server.DirectSender;
 import cn.oneao.noteclient.service.CommentService;
 import cn.oneao.noteclient.service.CommentUserService;
+import cn.oneao.noteclient.service.UserLevelService;
 import cn.oneao.noteclient.utils.IPUtil;
 import cn.oneao.noteclient.utils.MinioUtil;
 import cn.oneao.noteclient.utils.PhysicalAddressUtil;
@@ -61,8 +65,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     private NoteMapper noteMapper;
     @Autowired
     private RedisCache redisCache;
+    @Autowired
+    private UserLevelService userLevelService;
     //新增评论
     @Override
+    @ObserveUserLevel
     public Result<Object> addComment(HttpServletRequest httpServletRequest, MultipartFile multipartFile, CommentAddDTO commentAddDTO) {
         Integer commentUserId = commentAddDTO.getCommentUserId();//评论用户表id
         Integer noteShareId = commentAddDTO.getNoteShareId();//笔记分享表id
@@ -96,6 +103,12 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         //点赞数
         comment.setLikes(0);
         this.save(comment);
+        //更新UserLevel表
+        Integer userId = noteShareMapper.getUserIdByNoteShareId(noteShareId);
+        UserLevel userLevel = userLevelService.getOne(new LambdaQueryWrapper<UserLevel>().eq(UserLevel::getUserId, userId));
+        Integer shareNoteCommentNumber = userLevel.getShareNoteCommentNumber();
+        userLevel.setShareNoteCommentNumber(shareNoteCommentNumber + 1);
+        userLevelService.updateById(userLevel);
         //创建vo视图对象
         CommentVO commentVO = new CommentVO();
         commentVO.setId(comment.getId());
@@ -142,6 +155,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 rmCommentReplyNotice.setIndex(size);
                 redisCache.addCacheListObjectValue(redisKey,rmCommentReplyNotice);
             }
+            rmCommentReplyNotice.setMark(WebSocketMarkEnums.COMMENT_REPLY_NOTICE.getMark());
             directSender.sendCommentReplyNotice(rmCommentReplyNotice);
         }
         return Result.success(commentVO);

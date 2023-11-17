@@ -35,7 +35,7 @@ public class SqlStatementInterceptor implements Interceptor {
      * 获取配置中需要拦截的表
      */
     //@Value("#{'${tmall.sync.tables:}'.split(',')}")
-    private List<String> tableNames = Arrays.asList("small_note","user","note");
+    private List<String> tableNames = Arrays.asList("small_note","note");
 
 /*    @Lazy
     @Autowired

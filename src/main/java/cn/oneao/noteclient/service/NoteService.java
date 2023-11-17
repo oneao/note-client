@@ -32,5 +32,10 @@ public interface NoteService extends IService<Note> {
     //更新用户的笔记信息
     Result<Object> updateNoteMessage(NoteUpdateMessageDTO noteUpdateMessageDTO);
     //获取收藏的笔记
-    Result<Object> getCollectionNote();
+    Result<Object> getCollectionNote(NoteCollectionSearchDTO noteCollectionSearchDTO);
+    //取消收藏一个笔记
+    Result<Object> cancelCollectionNote(Integer noteId);
+
+    //批量取消收藏笔记
+    Result<Object> batchCancelCollectionNotes(List<Integer> noteIds);
 }

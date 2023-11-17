@@ -1,7 +1,9 @@
 package cn.oneao.noteclient;
 
 import cn.oneao.noteclient.constant.RedisKeyConstant;
+import cn.oneao.noteclient.mapper.NoteShareMapper;
 import cn.oneao.noteclient.pojo.entity.User;
+import cn.oneao.noteclient.pojo.vo.NoteShareAllVO;
 import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
 import cn.oneao.noteclient.utils.HttpClientUtil;
 import cn.oneao.noteclient.utils.RedisCache;
@@ -20,12 +22,8 @@ import java.util.List;
 @Slf4j
 class NoteClientApplicationTests {
     @Autowired
-    private RedisCache redisCache;
+    private NoteShareMapper noteShareMapper;
     @Test
     void contextLoads() {
-        User user = new User();
-        user.setPassword("123");
-        user.setNickName("oneao");
-        System.out.println(JSONObject.toJSONString(user));
     }
 }

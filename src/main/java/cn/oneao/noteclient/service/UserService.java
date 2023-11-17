@@ -11,9 +11,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.Map;
 
 public interface UserService extends IService<User> {
-
+    //注册
     Result<Object> userRegister(UserRegisterDTO userRegisterDTO);
-
+    //登录
     Result<Object> userLogin(String email, String password);
     //获取用户基本信息
     Result<Object> getUserInfo();

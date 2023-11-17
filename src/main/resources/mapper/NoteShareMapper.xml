@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--绑定接口-->
+<mapper namespace="cn.oneao.noteclient.mapper.NoteShareMapper">
+
+    <select id="getUserIdByNoteShareId" resultType="java.lang.Integer">
+        select note.user_id
+        from note
+        where note.id = (select note_share.note_id
+                         from note_share
+                         where note_share.id = #{noteShareId})
+    </select>
+    <!--    获取所有分享笔记列表-->
+    <select id="getShareNoteAll" resultType="cn.oneao.noteclient.pojo.vo.NoteShareAllVO">
+        SELECT ns.id AS noteShareId,
+        ns.note_share_title AS title,
+        ns.note_share_tags AS tags,
+        ns.note_share_remark as remark,
+        n.note_content AS content,
+        ns.note_like_number AS likeNumber,
+        ns.note_share_visit_number AS visitNumber,
+        ns.note_share_that_time AS shareTime,
+        ns.note_share_time AS shareDay,
+        ns.is_share_expire AS isShareExpire,
+        ns.is_need_password AS isNeedPassword
+        FROM note_share AS ns
+        JOIN note AS n ON ns.note_id = n.id
+        <where>
+            n.user_id = #{userId}
+            <if test="title != null and title != ''">
+                and ns.note_share_title like concat('%',#{title},'%')
+            </if>
+            <if test="day != null and day != ''">
+                and ns.note_share_time = #{day}
+            </if>
+            <if test="isExpire != null and isExpire != ''">
+                and ns.is_share_expire = #{isExpire}
+            </if>
+        </where>
+        limit #{page},#{pageSize}
+    </select>
+    <select id="getShareNoteCommentNumber" resultType="java.lang.Integer">
+        select count(*)
+        from comment
+        where note_share_id = #{noteShareId}
+    </select>
+    <select id="getShareNoteAllTotal" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM note_share AS ns
+        JOIN note AS n ON ns.note_id = n.id
+        <where>
+            n.user_id = #{userId}
+            <if test="title != null and title != ''">
+                and ns.note_share_title like concat('%',#{title},'%')
+            </if>
+            <if test="day != null and day != ''">
+                and ns.note_share_time = #{day}
+            </if>
+            <if test="isExpire != null and isExpire != ''">
+                and ns.is_share_expire = #{isExpire}
+            </if>
+        </where>
+    </select>
+</mapper>

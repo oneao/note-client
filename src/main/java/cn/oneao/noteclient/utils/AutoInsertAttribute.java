@@ -13,7 +13,7 @@ public class AutoInsertAttribute implements MetaObjectHandler {
     public void insertFill(MetaObject metaObject) {
         this.setFieldValByName("createTime", new Date(), metaObject);
         this.setFieldValByName("updateTime", new Date(), metaObject);
-        this.setFieldValByName("level",0,metaObject);
+        this.setFieldValByName("level",1,metaObject);
         this.setFieldValByName("status",0,metaObject);
         this.setFieldValByName("isDelete",0,metaObject);
         this.setFieldValByName("type",0,metaObject);

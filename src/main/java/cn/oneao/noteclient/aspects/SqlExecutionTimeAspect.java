@@ -23,6 +23,7 @@ import java.util.List;
 @Component
 @Slf4j
 public class SqlExecutionTimeAspect {
+
     @Autowired
     private SqlActionLogMapper sqlActionLogMapper;
     @Transactional
