@@ -1,10 +1,8 @@
 package cn.oneao.noteclient.config;
 
+import cn.oneao.noteclient.constant.MqConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -46,6 +44,7 @@ public class RabbitMqConfig {
     public DirectExchange directExchange() {
         return new DirectExchange(DIRECT_EXCHANGE);
     }
+
     @Bean
     public Binding binding1() {
         return BindingBuilder.bind(directQueue1()).to(directExchange()).with(ROUTING_KEY);
@@ -62,6 +61,32 @@ public class RabbitMqConfig {
     public Binding binding4() {
         return BindingBuilder.bind(directQueue4()).to(directExchange()).with(USER_LEVEL_UP_KEY);
     }
+
+    @Bean
+    public TopicExchange topicExchange(){
+        return new TopicExchange(MqConstants.NOTE_EXCHANGE,true,false);
+    }
+
+    @Bean
+    public Queue insertNoteQueue(){
+        return new Queue(MqConstants.NOTE_INSERT_OR_UPDATE_QUEUE, true);
+    }
+
+    @Bean
+    public Queue deleteNoteQueue(){
+        return new Queue(MqConstants.NOTE_DELETE_QUEUE, true);
+    }
+
+    @Bean
+    public Binding insertQueueBinding(){
+        return BindingBuilder.bind(insertNoteQueue()).to(topicExchange()).with(MqConstants.NOTE_INSERT_OR_UPDATE_KEY);
+    }
+
+    @Bean
+    public Binding deleteQueueBinding(){
+        return BindingBuilder.bind(deleteNoteQueue()).to(topicExchange()).with(MqConstants.NOTE_DELETE_KEY);
+    }
+
     @Bean
     public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
         return new Jackson2JsonMessageConverter(objectMapper);

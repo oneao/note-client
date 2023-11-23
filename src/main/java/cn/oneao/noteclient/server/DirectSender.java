@@ -1,6 +1,8 @@
 package cn.oneao.noteclient.server;
 
 import cn.oneao.noteclient.config.RabbitMqConfig;
+import cn.oneao.noteclient.constant.MqConstants;
+import cn.oneao.noteclient.pojo.entity.es.ESNote;
 import cn.oneao.noteclient.pojo.entity.rabbitmq.RMCommentReplyMessage;
 import cn.oneao.noteclient.pojo.entity.rabbitmq.RMCommentReplyNotice;
 import cn.oneao.noteclient.pojo.entity.rabbitmq.RMUserLevelUpNotice;
@@ -32,5 +34,16 @@ public class DirectSender {
     }
     public void sendUserLevelUpNotice(RMUserLevelUpNotice rmUserLevelUpNotice){
         rabbitTemplate.convertAndSend(RabbitMqConfig.DIRECT_EXCHANGE,RabbitMqConfig.USER_LEVEL_UP_KEY,rmUserLevelUpNotice);
+    }
+
+    //es类的文档操作
+    //新增或更新
+    public void sendDocumentInsertOrUpdateNotice(ESNote esNote){
+        log.info("==============1===================");
+        rabbitTemplate.convertAndSend(MqConstants.NOTE_EXCHANGE,MqConstants.NOTE_INSERT_OR_UPDATE_KEY,esNote);
+    }
+    //删除
+    public void sendDocumentDeleteNotice(String id){
+        rabbitTemplate.convertAndSend(MqConstants.NOTE_EXCHANGE,MqConstants.NOTE_DELETE_KEY,id);
     }
 }

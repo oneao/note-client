@@ -37,4 +37,6 @@ public interface UserService extends IService<User> {
     Result<Object> getCommentReply();
     //删除一个评论信息
     Result<Object> delOneCommentReply(Integer index);
+    //获取最近操作的笔记
+    Result<Object> getRecentOperationNote();
 }

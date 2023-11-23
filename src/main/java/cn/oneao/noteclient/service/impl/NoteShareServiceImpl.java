@@ -26,6 +26,9 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.logging.Log;
+import org.checkerframework.checker.index.qual.SameLen;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +42,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@Slf4j
 public class NoteShareServiceImpl extends ServiceImpl<NoteShareMapper, NoteShare> implements NoteShareService {
     @Autowired
     private NoteShareMapper noteShareMapper;
@@ -66,6 +70,10 @@ public class NoteShareServiceImpl extends ServiceImpl<NoteShareMapper, NoteShare
         queryWrapper.eq(NoteShare::getNoteId, noteId);
         NoteShare noteShare = this.getOne(queryWrapper);
         if (ObjectUtils.isEmpty(noteShare)) {
+            String redisKey = "NOTE_SHARE_USERID:" + UserContext.getUserId() + "_NOTEID:" + noteId;
+            if(redisCache.hasKey(redisKey)){
+                redisCache.deleteObject(redisKey);
+            }
             return Result.success(ResponseEnums.NOTE_SHARE_ALLOW_ADD);
         }
         Integer isShare = noteShare.getIsShareExpire();

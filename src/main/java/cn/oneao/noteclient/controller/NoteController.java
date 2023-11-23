@@ -6,6 +6,7 @@ import cn.oneao.noteclient.pojo.vo.NoteVO;
 import cn.oneao.noteclient.service.NoteService;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -151,6 +152,8 @@ public class NoteController {
     public Result<Object> batchCancelCollectionNotes(@RequestBody List<Integer> noteIds){
         return noteService.batchCancelCollectionNotes(noteIds);
     }
-
-
+    @GetMapping("/getElasticSearchValue")
+    public Result<Object> getElasticSearchValue(@Param("value")String value){
+        return noteService.getElasticSearchValue(value);
+    }
 }

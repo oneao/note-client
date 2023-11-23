@@ -6,7 +6,7 @@
 <!--绑定接口-->
 <mapper namespace="cn.oneao.noteclient.mapper.NoteMapper">
     <update id="updateNoteRecoveryOne">
-        update note set is_delete = 0 where id = #{noteId}
+        update note set is_delete = 0, update_time = NOW() where id = #{noteId}
     </update>
 <!--    彻底删除-->
     <delete id="completeDeleteNote" parameterType="Integer">
@@ -25,7 +25,7 @@
     </delete>
 <!--    批量恢复-->
     <update id="recoverMany" parameterType="Integer">
-        update note set is_delete = 0 where id in
+        update note set is_delete = 0,update_time = NOW() where id in
         <foreach collection="noteIds" item="id" separator="," open="(" close=")">
             #{id}
         </foreach>

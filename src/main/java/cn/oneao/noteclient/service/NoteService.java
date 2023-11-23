@@ -35,7 +35,8 @@ public interface NoteService extends IService<Note> {
     Result<Object> getCollectionNote(NoteCollectionSearchDTO noteCollectionSearchDTO);
     //取消收藏一个笔记
     Result<Object> cancelCollectionNote(Integer noteId);
-
     //批量取消收藏笔记
     Result<Object> batchCancelCollectionNotes(List<Integer> noteIds);
+    //获取es中的内容
+    Result<Object> getElasticSearchValue(String value);
 }

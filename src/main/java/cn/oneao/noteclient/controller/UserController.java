@@ -186,4 +186,8 @@ public class UserController {
     public Result<Object> delOneCommentReply(@RequestParam("index")Integer index){
         return userService.delOneCommentReply(index);
     }
+    @GetMapping("/getRecentOperationNote")
+    public Result<Object> getRecentOperationNote(){
+        return userService.getRecentOperationNote();
+    }
 }

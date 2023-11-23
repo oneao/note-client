@@ -5,6 +5,7 @@ import cn.oneao.noteclient.enums.NoteActionEnums;
 import cn.oneao.noteclient.enums.ResponseEnums;
 import cn.oneao.noteclient.enums.UserActionEnums;
 import cn.oneao.noteclient.mapper.NoteLogMapper;
+import cn.oneao.noteclient.mapper.NoteMapper;
 import cn.oneao.noteclient.mapper.UserMapper;
 import cn.oneao.noteclient.pojo.dto.user.UserForgetPasswordDTO;
 import cn.oneao.noteclient.pojo.dto.user.UserRegisterDTO;
@@ -14,6 +15,7 @@ import cn.oneao.noteclient.pojo.entity.User;
 import cn.oneao.noteclient.pojo.entity.UserLevel;
 import cn.oneao.noteclient.pojo.entity.log.UserLog;
 import cn.oneao.noteclient.pojo.entity.rabbitmq.RMCommentReplyNotice;
+import cn.oneao.noteclient.pojo.vo.RecentOperationNoteVO;
 import cn.oneao.noteclient.pojo.vo.UserInfoVO;
 import cn.oneao.noteclient.pojo.vo.UserLoginVO;
 import cn.oneao.noteclient.pojo.vo.UserTimeLineVO;
@@ -78,7 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = new User();
         user.setEmail(email);
         user.setNickName(email);
-        user.setAvatar("http://127.0.0.1:9000/note-bucket/adf77c91-1fe2-4610-971c-c033b9b62242.jpg");
+        user.setAvatar("http://127.0.0.1:9000/note/adf77c91-1fe2-4610-971c-c033b9b62242.jpg");
         //采用md5加密
         user.setPassword(DigestUtils.md5DigestAsHex((md5encryptAddSaltValue+userRegisterDTO.getPassword()).getBytes(StandardCharsets.UTF_8)));
         //新增返回的用户id
@@ -393,5 +395,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             redisCache.deleteCacheListValue(redisKey,1,rmCommentReplyNotice);
         }
         return Result.success();
+    }
+    //获取最近操作的笔记和小记
+    @Override
+    public Result<Object> getRecentOperationNote() {
+        int userId = UserContext.getUserId();
+        if(ObjectUtils.isEmpty(userId) || userId == -1){
+            return Result.error(ResponseEnums.PARAMETER_MISSING);
+        }
+        List<RecentOperationNoteVO> list = userMapper.getRecentOperationNote(userId);
+        return Result.success(list);
     }
 }

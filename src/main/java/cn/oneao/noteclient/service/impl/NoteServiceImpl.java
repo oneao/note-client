@@ -1,17 +1,20 @@
 package cn.oneao.noteclient.service.impl;
 
 import cn.oneao.noteclient.annotations.ObserveUserLevel;
+import cn.oneao.noteclient.constant.DocumentIndexConstant;
 import cn.oneao.noteclient.enums.NoteActionEnums;
 import cn.oneao.noteclient.enums.ResponseEnums;
 import cn.oneao.noteclient.mapper.NoteMapper;
 import cn.oneao.noteclient.mapper.NoteShareMapper;
 import cn.oneao.noteclient.pojo.dto.note.*;
 import cn.oneao.noteclient.pojo.entity.UserLevel;
+import cn.oneao.noteclient.pojo.entity.es.ESNote;
 import cn.oneao.noteclient.pojo.entity.note.Note;
 import cn.oneao.noteclient.pojo.entity.log.NoteLog;
 import cn.oneao.noteclient.pojo.entity.note.NoteShare;
 import cn.oneao.noteclient.pojo.vo.NoteCollectionVO;
 import cn.oneao.noteclient.pojo.vo.NoteVO;
+import cn.oneao.noteclient.server.DirectSender;
 import cn.oneao.noteclient.service.NoteLogService;
 import cn.oneao.noteclient.service.NoteService;
 import cn.oneao.noteclient.service.UserLevelService;
@@ -19,6 +22,11 @@ import cn.oneao.noteclient.utils.GlobalObjectUtils.UserContext;
 import cn.oneao.noteclient.utils.RedisCache;
 import cn.oneao.noteclient.utils.ResponseUtils.PageResult;
 import cn.oneao.noteclient.utils.ResponseUtils.Result;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -31,8 +39,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -47,6 +58,10 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
     private NoteShareMapper noteShareMapper;
     @Autowired
     private UserLevelService userLevelService;
+    @Autowired
+    private DirectSender directSender;
+    @Autowired
+    private ElasticsearchClient client;
 
     //获取笔记信息
     @Override
@@ -146,6 +161,8 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
             noteLog.setAction(NoteActionEnums.DELETE_NOTE_LOGIC.getActionName());
             noteLog.setActionDesc(NoteActionEnums.DELETE_NOTE_LOGIC.getActionDesc());
             noteLogService.save(noteLog);
+            //删除es中的文档
+            directSender.sendDocumentDeleteNotice(noteId.toString());
             return Result.success(ResponseEnums.NOTE_DELETE_LOGIC_SUCCESS);
         } else if (deleteType == 2) {
             //彻底删除
@@ -184,7 +201,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
             return Result.error(ResponseEnums.PARAMETER_MISSING);
         }
         Note note = this.getById(noteId);
-        if(note.getUserId() != UserContext.getUserId()){
+        if (note.getUserId() != UserContext.getUserId()) {
             return Result.error("获取失败");
         }
         if (ObjectUtils.isEmpty(note)) {
@@ -273,12 +290,19 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         if (ObjectUtils.isEmpty(noteId)) {
             return Result.error(ResponseEnums.PARAMETER_MISSING);
         }
-        LambdaUpdateWrapper<Note> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(Note::getId, noteId);
-        updateWrapper.set(Note::getNoteBody, noteBody);
-        updateWrapper.set(Note::getNoteContent, noteContent);
-        this.update(new Note(), updateWrapper);
-
+        Note note = this.getById(noteId);
+        note.setNoteBody(noteBody);
+        note.setNoteContent(noteContent);
+        this.updateById(note);
+        //更新到es里面
+        ESNote esNote = new ESNote();
+        esNote.setId(noteId.toString());
+        esNote.setNoteId(noteId);
+        esNote.setUserId(UserContext.getUserId());
+        esNote.setTitle(note.getNoteTitle());
+        esNote.setContent(noteContent);
+        esNote.setUpdateTime(note.getUpdateTime());
+        directSender.sendDocumentInsertOrUpdateNotice(esNote);
         //更新日志操作表
         NoteLog noteLog = new NoteLog();
         noteLog.setUserId(UserContext.getUserId());
@@ -326,13 +350,22 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         if (ObjectUtils.isEmpty(noteId)) {
             return Result.error(ResponseEnums.PARAMETER_MISSING);
         }
-        LambdaUpdateWrapper<Note> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(Note::getId, noteId);
-        updateWrapper.set(Note::getNoteTitle, noteUpdateMessageDTO.getNoteTitle());
-        updateWrapper.set(Note::getNoteBody, noteUpdateMessageDTO.getNoteBody());
-        updateWrapper.set(Note::getNoteTags, noteUpdateMessageDTO.getNoteTags());
-        updateWrapper.set(Note::getNoteBackgroundImage, noteUpdateMessageDTO.getNoteBackgroundImage());
-        this.update(new Note(), updateWrapper);
+        Note note = this.getById(noteId);
+        note.setNoteTitle(noteUpdateMessageDTO.getNoteTitle());
+        note.setNoteBody(noteUpdateMessageDTO.getNoteBody());
+        note.setNoteTags(noteUpdateMessageDTO.getNoteTags());
+        note.setNoteBackgroundImage(noteUpdateMessageDTO.getNoteBackgroundImage());
+        this.updateById(note);
+        //更新到es里面
+        ESNote esNote = new ESNote();
+        esNote.setId(noteId.toString());
+        esNote.setNoteId(noteId);
+        esNote.setUserId(UserContext.getUserId());
+        esNote.setTitle(note.getNoteTitle());
+        esNote.setContent(note.getNoteContent());
+        esNote.setUpdateTime(note.getUpdateTime());
+        directSender.sendDocumentInsertOrUpdateNotice(esNote);
+
         NoteLog noteLog = new NoteLog();
         noteLog.setUserId(UserContext.getUserId());
         noteLog.setNoteId(noteId);
@@ -422,6 +455,55 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note> implements No
         }
         userLevelService.updateById(userLevel);
         return Result.success();
+    }
+
+    //获取es笔记中的内容
+    @Override
+    public Result<Object> getElasticSearchValue(String value) {
+        List<ESNote> list = new ArrayList<>();
+        SearchResponse<ESNote> search = null;
+        try {
+            search = client.search(s -> s
+                            .index(DocumentIndexConstant.NOTE_INDEX)
+                            .query(q -> q
+                                    .bool(b -> b
+                                            .filter(f -> f
+                                                    .term(t -> t
+                                                            .field("userId")
+                                                            .value(UserContext.getUserId())
+                                                    ))
+                                            .must(m -> m
+                                                    .match(t -> t
+                                                            .field("content")
+                                                            .query(value)
+                                                            .analyzer("ik_max_word") // 设置分词器为IK分词器
+                                                    ))
+                                    ))
+                            .highlight(h -> h
+                                    .fields("content", f -> f
+                                            .preTags("<mark>")
+                                            .postTags("</mark>")
+                                    )
+                            )
+                            .sort(f -> f.field(o -> o.field("updateTime").order(SortOrder.Desc)))
+                    , ESNote.class
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        for (Hit<ESNote> hit : search.hits().hits()) {
+            ESNote esNote = hit.source();
+            assert esNote != null;
+            Map<String, List<String>> highlightFields = hit.highlight();
+            if (highlightFields.containsKey("content")) {
+                List<String> contentHighlights = highlightFields.get("content");
+                // 获取高亮内容，并将其应用到实体对象
+                esNote.setContent(contentHighlights.get(0));
+            }
+            log.info("esNoteContent: {}", esNote.getContent());
+            list.add(esNote);
+        }
+        return Result.success(list);
     }
 
     //获取视图笔记列表

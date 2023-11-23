@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--绑定接口-->
+<mapper namespace="cn.oneao.noteclient.mapper.UserMapper">
+
+    <select id="getRecentOperationNote" resultType="cn.oneao.noteclient.pojo.vo.RecentOperationNoteVO">
+        select note.id as id, note.note_title as title, 1 as type, note.update_time as updateTime
+        from note
+        where user_id = #{userId}
+          and update_time between NOW() - INTERVAL 30 DAY AND NOW()
+        union all
+        select small_note.id as id, small_note.small_note_title as title, 0 as type, small_note.update_time as updateTime
+        from small_note
+        where user_id = #{userId}
+          and update_time between NOW() - INTERVAL 30 DAY AND NOW()
+    </select>
+</mapper>

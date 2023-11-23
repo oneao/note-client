@@ -5,9 +5,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/note?characterEncoding=utf8&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://192.168.1.10:3306/note?characterEncoding=utf8&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
-    password: 1234
+    password: root
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       #配置初始化大小/最小/最大
@@ -19,14 +19,14 @@ spring:
   mail:
     host: smtp.163.com   #邮箱服务器地址
     username: hi_itao@163.com   #邮箱账号
-    password: DUKLCSBQGPFITHQT  #邮箱授权码
+    password: Xxx  #邮箱授权码
     default-encoding: utf-8    #默认编码
   data:
     redis:
-      host: 127.0.0.1
+      host: 192.168.1.10
       port: 6379
-      database: 1
-      #    password: 123456 #默认为空
+      database: 0
+      password: redis
       timeout: 3000ms
       lettuce:
         pool:
@@ -35,20 +35,15 @@ spring:
           max-idle: 8     # 最大空闲连接，默认8
           min-idle: 0     # 最小空闲连接，默认0
   rabbitmq:
-    host: localhost
+    host: 192.168.1.10
     port: 5672
     username: guest
     password: guest
     virtual-host: /
+  main:
+    allow-bean-definition-overriding: true #当遇到同样名字的时候，是否允许覆盖注册
   elasticsearch:
-    rest:
-      # 是否启用es
-      enable: false
-      uris: 127.0.0.1:9200
-      host: 127.0.0.1
-      port: 9200
-      username: elastic
-      password: Pt3IkSkBxKT8koj0l9xE
+    uris: http://192.168.1.10:9200
 mybatis-plus:
   # MyBatis映射器文件的位置
   mapper-locations: classpath*:mapper/*Mapper.xml
@@ -73,10 +68,15 @@ md5encrypt:
     value: one_ao
 # minio配置
 minio:
-  endpoint: http://127.0.0.1:9000
+  endpoint: http://192.168.1.10:9000
   accessKey: minioadmin
   secretKey: minioadmin
-  bucketName: note-bucket
+  bucketName: note
+# es配置
+elasticsearch:
+  host: 192.168.1.10
+  port: 9200
+  connect: http
 # 前端分享地址
 front:
   share:
